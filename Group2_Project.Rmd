@@ -1,0 +1,35 @@
+---
+title: "Group2_Project"
+authors: "Adam Burke"
+output: html_document
+date: "2025-10-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#Reading the data off local drive (set to your own file location)
+spotifyData  <- read.csv("C:/Users/Adam/Downloads/spotify_churn_dataset.csv")
+
+#Look at the data
+summary(spotifyData)
+
+#Load ggplot
+library(ggplot2)
+
+#Split the data frame into those who have churned and those who are active
+churnedSpotifyData <- spotifyData[spotifyData$is_churned == 1,]
+
+activeSpotifyData <- spotifyData[spotifyData$is_churned == 0,]
+
+#Create box plot to look at variance between churned and non churned members 
+activeBox <- boxplot(activeSpotifyData$age, main = "Active Boxplot for Age")
+churnedBox <- boxplot(churnedSpotifyData$age, main = "Churned Boxplot for Age")
+
+#Hmm, not much variance there... Lets compare summaries...
+summary(activeSpotifyData)
+summary(churnedSpotifyData)
+
+#Churned users play more song, higher skip rate, listen to less ads, and do more offline listening. There difference looks marginal albeit, but maybe itll be enough to come to some sort of conclusion?
