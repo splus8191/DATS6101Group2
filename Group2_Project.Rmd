@@ -1,6 +1,6 @@
 ---
 title: "Group2_Project"
-authors: "Adam Burke"
+authors: "Adam Burke, Laura Escher, Muhannad Alhamoudi, Jael Rojas"
 output: html_document
 date: "2025-10-03"
 ---
@@ -24,8 +24,9 @@ churnedSpotifyData <- spotifyData[spotifyData$is_churned == 1,]
 
 activeSpotifyData <- spotifyData[spotifyData$is_churned == 0,]
 
-#Create box plot to look at variance between churned and non churned members 
+#Create box plot of age to look at variance between churned and non churned members 
 activeBox <- boxplot(activeSpotifyData$age, main = "Active Boxplot for Age")
+
 churnedBox <- boxplot(churnedSpotifyData$age, main = "Churned Boxplot for Age")
 
 #Hmm, not much variance there... Lets compare summaries...
@@ -33,3 +34,23 @@ summary(activeSpotifyData)
 summary(churnedSpotifyData)
 
 #Churned users play more song, higher skip rate, listen to less ads, and do more offline listening. There difference looks marginal albeit, but maybe itll be enough to come to some sort of conclusion?
+
+#Rows that are null 
+sum(rowSums(is.na(activeSpotifyData)) > 0)
+sum(rowSums(is.na(churnedSpotifyData)) > 0)
+
+#group memebership 
+
+table(activeSpotifyData$gender)
+
+table(churnedSpotifyData$gender)
+
+table(activeSpotifyData$country)
+
+table(churnedSpotifyData$country)
+
+table(activeSpotifyData$subscription_type)
+
+table(churnedSpotifyData$subscription_type)
+
+
