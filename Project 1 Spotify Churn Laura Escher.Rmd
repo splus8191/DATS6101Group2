@@ -62,6 +62,7 @@ The SMART question that I would like to consider is, "Do free users churn at a h
 spotify$subscription_type <- as.factor(spotify$subscription_type)
 summary(spotify$subscription_type)
 ```
+Now, let's calculate the sample percentage of users who churned based on subscription type as part of our descriptive statistics.
 ```{r}
 spotify %>%
   group_by(subscription_type) %>%
@@ -71,24 +72,28 @@ spotify %>%
 ```
 Here, I create subscription type as a factor variable so I can count how many of each type of subscription are in the data set. The highest subscription type is Premium, followed by Free, Student, and Family with the lowest. The chart helps us clearly see the number of users in each subscription type and their mean churn rate (in percentage terms).
 
-Since we want to compare free users against the other types, let's subset the data to compare. We am interested to see how they compare with their confidence intervals and a boxplot.
+Since we want to compare free users against the other types, let's subset the data to compare. We am interested to see how they compare with their confidence intervals and a graph.
 
 ```{r}
 free.spotify <- subset(spotify, spotify$subscription_type=="Free")
-othersubs <- subset(spotify, spotify$subscription_type!="Free")
+paid.spotify <- subset(spotify, spotify$subscription_type!="Free")
 ```
 
 ```{r}
-t.test(free.spotify$is_churned, conf.level = 0.99)
-t.test(othersubs$is_churned, conf.level = 0.99)
+t.test(free.spotify$is_churned, conf.level = 0.90)
+t.test(paid.spotify$is_churned, conf.level = 0.90)
+
+t.test(free.spotify$is_churned, paid.spotify$is_churned, conf.level = 0.90)
 ```
 
-After examining the confidence intervals at standard significance levels, we do not see a statistically significant difference between free users versus other types of users on whether a given user would churn. Let's make a comparison across all the groups to highlight how they are not statistically different from one another.
+We examined them individually in a one sample t test, then together in a two sample t test. After examining the confidence intervals at the 90% confidence level, we do not see a statistically significant difference from zero with free users versus paid users on whether a given user would churn ([0.233, 0.265] and [0.253, 0.271]). With the two sample t-test, the p-value is 0.3, and we would fail to reject this at standard significance levels. This means that free users do not differ significantly in their churn rate versus paid users.
+
+Let's make a comparison across all the groups to highlight how they are not statistically different from one another using a graph.
 
 ```{r}
 ggplot(spotify, aes(x = subscription_type, y = is_churned, fill = subscription_type)) +
   stat_summary(fun = mean, geom = "bar", width = 0.6) +
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.2, conf.int = 0.99) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.2, conf.int = 0.90) +
   labs(
     x = "Subscription Type",
     y = "Mean Churn Rate",
@@ -96,9 +101,68 @@ ggplot(spotify, aes(x = subscription_type, y = is_churned, fill = subscription_t
   ) +
   theme_minimal()
 ```
-What level of significance would it take to show a statistically similar difference among user type?
+
+Now that we have identified that each subscription type and churn do not have a statistically significant relationship at the 10% significance level, we performed some chi square tests of independence on subscription type and other categorical variables in our data set to confirm our results.
+
+```{r Chi Square Test to Verify Independence of Categorical Variables}
+categorical_vars <- c("gender", "subscription_type", "country", "device_type", "offline_listening")
+
+for(var in categorical_vars) {
+  test_result <- chisq.test(spotify[[var]], spotify$is_churned)
+  
+  if(test_result$p.value < 0.10) {
+    cat(var, "- SIGNIFICANT (p =", test_result$p.value, ")\n")
+  } else {
+    cat(var, "- NOT significant (p =", test_result$p.value, ")\n")
+  }
+}
+```
+After running the chi-square tests for independence to examine the relationship between each categorical variable and churn, we did not find statistically significant results at the 10% significance level. When examined individually, gender, subscription_type, country, device_type, and offline_listening did not show a significant association with whether a given user will churn.
+
+What if the number of songs played per day and a user's subscription type has something to do with whether they will churn? We investigate below.
 
 ```{r}
-t.test(free.spotify$is_churned, conf.level = 0.55)
-t.test(othersubs$is_churned, conf.level = 0.55)
+max(spotify$songs_played_per_day)
+min(spotify$songs_played_per_day)
+```
+The minimum number of songs played per day are 1 and the maximum songs played per day are 99. There might be a relationship here! First, let's test whether songs played per day has a relationship with whether someone churns. We created a new factor variable, called listening_category, to examine the relationships among churn with different intensities of song listeners.
+```{r}
+spotify$listening_category <- cut(spotify$songs_played_per_day,
+                                   breaks = c(1, 33, 66, 99),
+                                   labels = c("Low", "Medium", "High"),
+                                   include.lowest = TRUE)
+summary(spotify$listening_category)
+class(spotify$listening_category)
+```
+There are 2627 low listeners, 2706 medium listeners, and 2667 high listeners. Now, let's compare them across subscription type and their listening habits and see which one churned the most.
+
+```{r}
+tapply(spotify$is_churned==1, 
+       list(spotify$subscription_type, spotify$listening_category), 
+       mean)
+```
+After looking at the chart, we can see that family plan users who had low listening churned the most at 29.3%. Student plan users with low listening churned the least at 23.9%. However, is this statistically significant, or are any of these results statistically significant? We start with a box plot and bar chart of the songs played per day or listening categories from the lens of subscription type.
+```{r}
+ggplot(spotify, aes(x = subscription_type, y = songs_played_per_day)) +
+  geom_boxplot() +
+  labs(
+    title = "Songs Played Per Day by Subscription Type",
+    x = "Subscription Type",
+    y = "Songs Played Per Day",
+  ) +
+  theme_minimal()
+
+ggplot(spotify, aes(x = listening_category, fill = subscription_type)) +
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Distribution of Listening Categories by Subscription Type",
+    x = "Listening Category",
+    y = "Number of Users in Listening Category",
+    fill = "Subscription Plan"
+  ) +
+  theme_minimal()
+```
+After looking at both of these graphs, it appears that songs played per day by subscription type does not differ very much and the box plots overlap, indicating a lack of statistical significance. When it comes to the bar chart, binning different listening habits did not seem to reveal a difference between each plan that much upon first glance. Running some statistical tests will confirm our thinking.
+```{r}
+
 ```
