@@ -125,7 +125,14 @@ What if the number of songs played per day and a user's subscription type has so
 max(spotify$songs_played_per_day)
 min(spotify$songs_played_per_day)
 ```
-The minimum number of songs played per day are 1 and the maximum songs played per day are 99. There might be a relationship here! First, let's test whether songs played per day has a relationship with whether someone churns. We created a new factor variable, called listening_category, to examine the relationships among churn with different intensities of song listeners.
+The minimum number of songs played per day are 1 and the maximum songs played per day are 99. There might be a relationship here! First, let's test whether songs played per day has a relationship with whether someone churns.
+```{r which test to choose?}
+chisq.test(spotify$songs_played_per_day, spotify$is_churned)
+test<- t.test(spotify$songs_played_per_day, spotify$is_churned, conf.level = 0.90)
+```
+With a p-value of 0.09, we find evidence that songs played per day has a statistically significant relationship with whether a given user will churn. This means that the number of songs a given user plays will affect their decision to churn.
+
+To investigate a little further with the impact of songs played per day, we created a new factor variable called listening_category. We are interested in examining whether there are any relationships among churn with different intensities of song listeners.
 ```{r}
 spotify$listening_category <- cut(spotify$songs_played_per_day,
                                    breaks = c(1, 33, 66, 99),
@@ -135,7 +142,6 @@ summary(spotify$listening_category)
 class(spotify$listening_category)
 ```
 There are 2627 low listeners, 2706 medium listeners, and 2667 high listeners. Now, let's compare them across subscription type and their listening habits and see which one churned the most.
-
 ```{r}
 tapply(spotify$is_churned==1, 
        list(spotify$subscription_type, spotify$listening_category), 
@@ -162,7 +168,18 @@ ggplot(spotify, aes(x = listening_category, fill = subscription_type)) +
   ) +
   theme_minimal()
 ```
-After looking at both of these graphs, it appears that songs played per day by subscription type does not differ very much and the box plots overlap, indicating a lack of statistical significance. When it comes to the bar chart, binning different listening habits did not seem to reveal a difference between each plan that much upon first glance. Running some statistical tests will confirm our thinking.
+After looking at both of these graphs, it appears that songs played per day by subscription type does not differ very much and the box plots overlap, indicating a lack of statistical significance. When it comes to the bar chart, binning different listening habits did not seem to reveal a difference between each plan that much upon first glance. Running some statistical tests will confirm our thinking. I will also perform a chi squared test of independence for listening category and churn.
 ```{r}
+chisq.test(spotify$listening_category, spotify$is_churned)
+chisq.test(spotify$listening_category, spotify$subscription_type)
+```
+The chi-squared test for independence reveals with a p-value of 0.2 that listening_category and subscription_type are not statistically significant from each other, meaning they are independent. We fail to reject the null hypothesis that they are independent.
 
+Regarding the independence of listening category and churn, once again, these variables are independent of each other at a p-value of 1. Again, we fail to reject the null hypothesis that they are independent.
+
+What if we interact listening_category with subscription type, and number of songs played with subscription type, then compared those statistical tests?
+
+```{r}
+spotify$listen_sub <- interaction(spotify$listening_category, spotify$subscription_type)
+chisq.test(spotify$listen_sub, spotify$is_churned)
 ```
