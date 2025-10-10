@@ -61,6 +61,8 @@ The SMART question that I would like to consider is, "Do free users churn at a h
 ```{r}
 spotify$subscription_type <- as.factor(spotify$subscription_type)
 summary(spotify$subscription_type)
+
+summary(spotify)
 ```
 Now, let's calculate the sample percentage of users who churned based on subscription type as part of our descriptive statistics.
 ```{r}
@@ -85,7 +87,6 @@ t.test(paid.spotify$is_churned, conf.level = 0.90)
 
 t.test(free.spotify$is_churned, paid.spotify$is_churned, conf.level = 0.90)
 ```
-
 We examined them individually in a one sample t test, then together in a two sample t test. After examining the confidence intervals at the 90% confidence level, we do not see a statistically significant difference from zero with free users versus paid users on whether a given user would churn ([0.233, 0.265] and [0.253, 0.271]). With the two sample t-test, the p-value is 0.3, and we would fail to reject this at standard significance levels. This means that free users do not differ significantly in their churn rate versus paid users.
 
 Let's make a comparison across all the groups to highlight how they are not statistically different from one another using a graph.
@@ -121,14 +122,15 @@ After running the chi-square tests for independence to examine the relationship 
 
 What if the number of songs played per day and a user's subscription type has something to do with whether they will churn? We investigate below.
 
-```{r}
+```{r Max and Min of Songs Played Per Day}
 max(spotify$songs_played_per_day)
 min(spotify$songs_played_per_day)
 ```
 The minimum number of songs played per day are 1 and the maximum songs played per day are 99. There might be a relationship here! First, let's test whether songs played per day has a relationship with whether someone churns.
 ```{r which test to choose?}
 chisq.test(spotify$songs_played_per_day, spotify$is_churned)
-test<- t.test(spotify$songs_played_per_day, spotify$is_churned, conf.level = 0.90)
+
+#t.test(spotify$songs_played_per_day, spotify$is_churned, conf.level = 0.90)
 ```
 With a p-value of 0.09, we find evidence that songs played per day has a statistically significant relationship with whether a given user will churn. This means that the number of songs a given user plays will affect their decision to churn.
 
@@ -168,6 +170,7 @@ ggplot(spotify, aes(x = listening_category, fill = subscription_type)) +
   ) +
   theme_minimal()
 ```
+
 After looking at both of these graphs, it appears that songs played per day by subscription type does not differ very much and the box plots overlap, indicating a lack of statistical significance. When it comes to the bar chart, binning different listening habits did not seem to reveal a difference between each plan that much upon first glance. Running some statistical tests will confirm our thinking. I will also perform a chi squared test of independence for listening category and churn.
 ```{r}
 chisq.test(spotify$listening_category, spotify$is_churned)
@@ -180,6 +183,12 @@ Regarding the independence of listening category and churn, once again, these va
 What if we interact listening_category with subscription type, and number of songs played with subscription type, then compared those statistical tests?
 
 ```{r}
-spotify$listen_sub <- interaction(spotify$listening_category, spotify$subscription_type)
+spotify$listen_sub_interact <- interaction(spotify$listening_category, spotify$subscription_type)
 chisq.test(spotify$listen_sub, spotify$is_churned)
 ```
+With a p-value of 0.6, the results are not statistically significant and these variables are independent from one another.
+```{r}
+spotify$numsongs_sub_interact <- interaction(spotify$songs_played_per_day, spotify$subscription_type)
+chisq.test(spotify$numsongs_sub_interact, spotify$is_churned)
+```
+With a p-value of 0.8, the results are once again not statistically significant and these variables are independent from one another.
