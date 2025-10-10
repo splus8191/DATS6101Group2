@@ -28,7 +28,7 @@ When you click the **Knit** button a document will be generated that includes bo
 library(ggplot2)
 library(dplyr)
 
-spotify <- read.csv("C:/Users/esche/OneDrive - The George Washington University/Intro to Data Science/Data Science Project 1/spotify_churn_dataset.csv")
+spotify <- read.csv("C:/Users/Adam/Downloads/spotify_churn_dataset.csv")
 
 str(spotify)
 
@@ -158,7 +158,7 @@ ggplot(spotify, aes(x = subscription_type, y = songs_played_per_day)) +
     x = "Subscription Type",
     y = "Songs Played Per Day",
   ) +
-  theme_minimal()
+  stat_summary(fun = "mean", geom = "point", color = "blue")
 
 ggplot(spotify, aes(x = listening_category, fill = subscription_type)) +
   geom_bar(position = "dodge") +
@@ -192,3 +192,40 @@ spotify$numsongs_sub_interact <- interaction(spotify$songs_played_per_day, spoti
 chisq.test(spotify$numsongs_sub_interact, spotify$is_churned)
 ```
 With a p-value of 0.8, the results are once again not statistically significant and these variables are independent from one another.
+
+this is painful, lets do a heatmap or something. If nothing pops up here, it might be time to throw in the towel.
+
+churnedSpotifyData <- spotifyData[spotifyData$is_churned == 1,]
+
+activeSpotifyData <- spotifyData[spotifyData$is_churned == 0,]
+
+# Select only numeric columns
+churned_numeric <- churnedSpotifyData[ , sapply(churnedSpotifyData, is.numeric)]
+active_numeric  <- activeSpotifyData[ , sapply(activeSpotifyData, is.numeric)]
+
+
+#get rid of user_id and is churned
+churned_numeric$user_id <- NULL
+active_numeric$user_id <- NULL
+churned_numeric$is_churned <- NULL
+active_numeric$is_churned <- NULL
+
+# group means 
+churned_means <- colMeans(churned_numeric, na.rm = TRUE)
+active_means  <- colMeans(active_numeric, na.rm = TRUE)
+
+#difference
+spotifydifvec <- churned_means - active_means
+spotifydiffdf <- data.frame(
+  Feature = names(diff_vec),
+  Difference = as.numeric(diff_vec)
+)
+
+#plotting 
+ggplot(spotifydiffdf, aes(x = Feature, y = 1, fill = Difference)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "red", mid = "white", high = "blue") +
+  labs(title = "Difference Heatmap: Churned is Blue, Active is Red",
+       y = NULL)
+
+now i think we are getting somewhere, even if the result is marginal this shows something
