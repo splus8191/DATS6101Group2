@@ -1,0 +1,149 @@
+---
+title: "Project 1, EDA"
+author: "Muhannad"
+# date: "today"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    number_sections: true
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes some helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# You will need to install it (once) from GitHub.
+# library(devtools)
+# devtools::install_github("physicsland/ezids")
+# Then load the package in your R session.
+library(ezids)
+```
+
+```{r setup, include=FALSE}
+# Some of common RMD options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+knitr::opts_chunk$set(results="markup", warning = F, message = F)
+options(scientific=T, digits = 3) 
+```
+
+## Data
+
+let's load our data and create a dataframe call **sp**, then take a look.
+
+```{r}
+sp = read.csv("spotify_churn_dataset.csv", header = TRUE)
+str(sp)
+head(sp)
+xkablesummary(data.frame(sp, title = "Spotify Summary"))
+summary(sp)
+colSums(is.na(sp))
+dim(sp)
+length(unique(sp$user_id))      # unique users
+sum(duplicated(sp$user_id))     # how many duplicates
+```
+
+## Converting character to categorical
+
+let's convert `gender`, `country`, `subscription_type`, `device_type`, and `is_churned` to categories
+```{r}
+sp$is_churned = factor(sp$is_churned, levels = c(0, 1), labels = c("active", "churned"))
+sp$gender = as.factor(sp$gender)
+sp$country = as.factor(sp$country)
+sp$subscription_type = as.factor(sp$subscription_type)
+sp$device_type = as.factor(sp$device_type)
+xkablesummary(data.frame(sp, title = "Spotify Summary"))
+```
+
+## Target balance (is_churned)
+
+We need to know if churn is rare or common.
+
+```{r}
+tbl = table(sp$is_churned)
+tbl
+round(100 * prop.table(tbl), 2)
+```
+```{r}
+barplot(tbl,
+        main = "Churn balance",
+        ylab = "Count",
+        col = c("gray80","gray40"))
+```
+
+
+## EDA Plots and summary Statistics: Mean, SD
+
+Now, let's do some EDA.
+
+```{r}
+library(ggplot2)
+
+ggplot(sp, aes(x = is_churned, y = ads_listened_per_week)) +
+  geom_boxplot() +
+  labs(title = "Ads per week by churn", x = "Churn group", y = "Ads per week")
+
+tapply(sp$ads_listened_per_week, sp$is_churned, mean); tapply(sp$ads_listened_per_week, sp$is_churned, sd)
+```
+Distribution is strongly right-skewed with many outliers for both groups; medians are very low and almost identical. On its own, ads exposure does not separate churn; likely confounded by subscription_type (free ≈ more ads, the rest = 0)
+
+
+```{r}
+ggplot(sp, aes(x = is_churned, y = skip_rate)) +
+  geom_boxplot() +
+  labs(title = "Skip rate by churn", x = "Churn group", y = "Skip rate")
+
+tapply(sp$skip_rate, sp$is_churned, mean); tapply(sp$skip_rate, sp$is_churned, sd)
+```
+The churned group shows a slightly higher median and a modestly higher spread → users who skip more tracks are more likely to churn (small–moderate effect).
+
+```{r}
+ggplot(sp, aes(x = is_churned, y = songs_played_per_day)) +
+  geom_boxplot() +
+  labs(title = "Songs/day by churn", x = "Churn group", y = "Songs per day")
+
+tapply(sp$songs_played_per_day, sp$is_churned, mean); tapply(sp$songs_played_per_day, sp$is_churned, sd)
+
+```
+Medians and IQRs are very similar across groups → overall play volume does not clearly distinguish churners in the marginal view.
+
+```{r}
+ggplot(sp, aes(x = is_churned, y = listening_time)) +
+  geom_boxplot() +
+  labs(title = "Listening time by churn", x = "Churn group", y = "Minutes")
+
+tapply(sp$listening_time, sp$is_churned, mean); tapply(sp$listening_time, sp$is_churned, sd)
+```
+Distributions are close; any difference in medians is small → total minutes alone is not a strong separator.
+
+```{r}
+ggplot(sp, aes(x = is_churned, y = age)) +
+  geom_boxplot() +
+  labs(title = "Age by churn", x = "Churn group", y = "Age")
+
+tapply(sp$age, sp$is_churned, mean); tapply(sp$age, sp$is_churned, sd)
+
+```
+Medians/IQRs are nearly identical → age alone shows little to no association with churn.
+
+## Conclusion
+Size & balance: Dataset has 8000 rows, 12 columns; churn rate ≈ 25.9% (2071/8000).
+Numeric vs churn: Skip rate slightly higher for churned; ads heavily right-skewed with similar medians overall; songs/day, listening time, age show minimal separation.
+Across numeric features, means and SDs are nearly the same between active and churned users, with only a slight uptick in skip rate for churned and a highly right-skewed ads distribution (likely subscription-mix).
+
+```{r}
+round(prop.table(table(sp$subscription_type, sp$is_churned), 1), 3)
+```
+```{r}
+round(prop.table(table(sp$device_type, sp$is_churned), 1), 3)
+```
+```{r}
+round(prop.table(table(sp$country, sp$is_churned), 1), 3)
+```
+
