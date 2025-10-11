@@ -110,3 +110,12 @@ summary(anova_model)
 par(mfrow=c(2,2))
 plot(anova_model)
 ```
+Conclussions:
+
+- EDA analysis allows to evaluate which features contribute most to churn as: user demographics (gender), 
+demographic details (country), listening patterns (session duration), device usage, etc.
+- The dataset is rich but may not capture all factors influencing churn such as detailed user satisfaction,
+competitive offers, or external market conditions, and limiting explanation.
+- Tha data not include longitudinal data or changing patterns over time, which affects the churn models. 
+- Quality issues due the data gathered from data devices and subscription type, may present noise or inconsistency.
+
