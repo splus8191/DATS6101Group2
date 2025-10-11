@@ -147,3 +147,36 @@ round(prop.table(table(sp$device_type, sp$is_churned), 1), 3)
 round(prop.table(table(sp$country, sp$is_churned), 1), 3)
 ```
 
+## ANOVA compare means across 3+ groups (quantitative ~ categorical)
+
+Quick visuals + group summaries (EDA before ANOVA)
+
+```{r}
+
+# Boxplot by group
+ggplot(sp, aes(x = subscription_type, y = skip_rate)) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(title = "Skip rate by subscription type", x = NULL, y = "Skip rate")
+
+# Group means/SDs (to describe size/direction)
+tapply(sp$skip_rate, sp$subscription_type, mean)
+tapply(sp$skip_rate, sp$subscription_type, sd)
+table(sp$subscription_type)
+```
+
+```{r}
+# Fit once so we can get residuals
+fit = aov(skip_rate ~ subscription_type, data = sp)
+
+# Q–Q plot of residuals
+qqnorm(residuals(fit)); qqline(residuals(fit))
+
+# Optional variance check (Bartlett is in base R; sensitive to non-normality)
+bartlett.test(skip_rate ~ subscription_type, data = sp)
+
+```
+```{r}
+summary(fit)
+```
+Mean skip_rate was very similar across subscription types (Family 0.300, Free 0.301, Premium 0.297, Student 0.303). One-way ANOVA: F(3, 7996) = 0.48, p = 0.70; we fail to reject equal means at α = 0.05. Any observed differences are small and not statistically detectable in this sample.
