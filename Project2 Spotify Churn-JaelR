@@ -1,0 +1,112 @@
+---
+title: "Project Spotify analysis"
+author: "Jael Rojas"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+  code_folding: hide
+number_sections: false
+toc: yes
+toc_depth: 3
+toc_float: yes
+pdf_document:
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# Can globally set option for number display format.
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+```
+
+#Opening the file
+```{r}
+# getwd()
+spotify <- read.csv("C:/Users/Jael Rojas/Documents/MS_DataScience/DataScience/presentation/spotify_churn_dataset.csv", header = TRUE)
+str(spotify)
+head(spotify)
+spotify
+```
+**summary statistics
+#Overview data
+
+```{r statist_gender}
+library(ezids)
+xkablesummary(spotify)
+spotify$gender <- as.factor(spotify$gender)
+summary(spotify)
+```
+
+# EDA for device_type 
+```{r statist_churned}
+table(spotify$is_churned)
+ggplot(spotify, aes(x = factor(is_churned), fill = factor(is_churned))) +
+  geom_bar() + labs(title = "Churn vs. Non-Churn Count",
+                    x = "Churned (1) / Not Churned (0)", y = "User Count")
+```
+
+# Churn by country
+
+```{r ccountry}
+churn_country <- spotify %>%
+  group_by(country) %>%
+  summarise(churn_rate = mean(is_churned), count = n())
+
+ggplot(churn_country, aes(x = reorder(country, churn_rate), y = churn_rate)) +
+  geom_col(fill = "coral") + coord_flip() +
+  labs(title = "Churn Rate by Country", x = "Country", y = "Churn Rate")
+```
+
+```{r gender}
+churn_gender <- spotify %>%
+  group_by(gender) %>%
+  summarise(churn_rate = mean(is_churned), count = n())
+
+ggplot(churn_gender, aes(x = gender, y = churn_rate, fill = gender)) +
+  geom_col() +
+  labs(title = "Churn Rate by Gender", y = "Churn Rate", x = "Gender")
+```
+
+```{r device_type}
+ggplot(spotify, aes(x = device_type, y = listening_time, fill = factor(is_churned))) +
+  geom_boxplot() +
+  labs(title = "Churn Status : Listening Time by Device Type",
+       x = "Device Type", y = "Listening Time", fill = "Churned")
+```
+
+```{r group_combo}
+churn_combo <- spotify %>%
+  group_by(country, gender, device_type) %>%
+  summarise(churn_rate = mean(is_churned), mean_listening = mean(listening_time), count=n())
+
+ggplot(churn_combo, aes(x = device_type, y = churn_rate, color = gender)) +
+  geom_point(aes(size = mean_listening)) +
+  facet_wrap(~country) +
+  labs(title = "Churn Rate by Country, Gender, Device Type",
+       x = "Device Type", y = "Churn Rate")
+```
+
+#ANOVA Hypotesis Test
+```{r anovat}
+library(car)  
+
+#First we will check the distribution of listening_time (ANOVA assumes residuals are approximately normal)
+hist(spotify$listening_time, breaks=30, main="Histogram of Listening Time", xlab="Listening Time")
+```
+
+```{r anova_model}
+# Lets fit an ANOVA model with interaction terms for country, gender, device_type
+anova_model <- aov(listening_time ~ country * gender * device_type, data = spotify)
+# Summary of the ANOVA
+summary(anova_model)
+```
+
+```{r anovad}
+# Diagnostic plots to validate ANOVA
+par(mfrow=c(2,2))
+plot(anova_model)
+```
