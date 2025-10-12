@@ -28,15 +28,17 @@ When you click the **Knit** button a document will be generated that includes bo
 library(ggplot2)
 library(dplyr)
 
-spotify <- read.csv("C:/Users/esche/OneDrive - The George Washington University/Intro to Data Science/Data Science Project 1/spotify_churn_dataset.csv")
+spotify <- read.csv("C:/Users/Adam/Downloads/spotify_churn_dataset.csv")
 
-str(spotify)
+glimpse(spotify)
 
 colSums(is.na(spotify))
 
-nrow(spotify)
+cor(spotify[sapply(spotify, is.numeric)], use = "complete.obs")
 
-#sum(spotify$gender=='Male')
+boxplot.stats(spotify$age)$out
+boxplot.stats(spotify$listening_time)$out
+boxplot.stats(spotify$offline_listening)$out
 ```
 I first opened up the file and examined the data using the str() function. I checked to see if there are any missing values in the data, which there are none. There are 8000 observations in this data set, and 12 variables. The variables are:
 
@@ -231,3 +233,21 @@ ggplot(spotifydiffdf, aes(x = Feature, y = 1, fill = Difference)) +
         axis.text.y = element_blank())
 
 Even if visual differences seem marginal, this heatmap highlights where churned users differ numerically from actives. 
+
+
+#Smart Question, Country with highest churn rate and lowest
+For this question, I felt as if the demographics of each country could make a difference. My theory is that countries of lesser income will be more likely to churn. 
+
+unique(spotify$gender)
+
+
+Now lets look at average income by country
+US:83700  CA:63500  AU:65000  FR:47000  
+DE:44000  UK:37000  IN:4500  PK:3500
+
+Now the prediction should be that the higher the income the lower the churn rate. Lets test that prediction. 
+
+table(churnedSpotifyData$country)
+
+table(activeSpotifyData$country)
+
