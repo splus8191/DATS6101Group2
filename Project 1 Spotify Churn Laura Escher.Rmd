@@ -248,6 +248,30 @@ DE:44000  UK:37000  IN:4500  PK:3500
 Now the prediction should be that the higher the income the lower the churn rate. Lets test that prediction. 
 
 table(churnedSpotifyData$country)
-
 table(activeSpotifyData$country)
+
+churnedcount <- table(churnedSpotifyData$country)
+activecount  <- table(activeSpotifyData$country)
+
+comparison <- data.frame(
+  country = union(names(churnedcount), names(activecount)),
+  churned = as.numeric(churnedcount[union(names(churnedcount), names(activecount))]),
+  active  = as.numeric(activecount[union(names(churnedcount), names(activecount))])
+)
+
+comparison <- comparison %>%
+  mutate(ratio = churned / active,
+  dense_rank = dense_rank(ratio)
+)
+
+ggplot(comparison, aes(x = country, y = ratio)) +
+  geom_col(fill = "red") +
+  labs(
+    title = "Churned-to-Active Ratio by Country",
+    y = "Ratio (Churned / Active)"
+  ) 
+  
+  
+dense_ranks <- dense_rank(comparison$ratio)
+
 
