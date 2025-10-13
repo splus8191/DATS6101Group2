@@ -105,8 +105,22 @@ ggplot(comparison, aes(x = country, y = ratio)) +
     title = "Churned to Active Ratio by Country",
     y = "Ratio"
   ) 
-  
+ggplot(world_data, aes(fill = churn_ratio)) +
+  geom_sf() +
+  labs(title = "Global Churn Ratio by Country")
   
 dense_ranks <- dense_rank(comparison$ratio)
+
+actualrankings <- c("IN","UK","CA","US","AU","FR","DE","PK")
+
+predictrankings <- c("US","CA","AU","FR","DE","UK","IN","PK")
+
+sum(predictrankings == actualrankings)
+
+
+predicted_positions <- match(predictrankings, actualrankings)
+actual_positions <- seq_along(actualrankings)
+
+cor(predicted_positions, actual_positions, method = "spearman")
 
 
