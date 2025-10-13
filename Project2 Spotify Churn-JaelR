@@ -111,13 +111,29 @@ ggplot(churn_combo, aes(x = device_type, y = churn_rate, color = gender)) +
 ```{r anovat}
 library(car)  
 
-#First we will check the distribution of listening_time (ANOVA assumes residuals are approximately normal)
+#First we will check the distribution of listening_time. From the shape we does not have normal distribution, 
+for nonviolate we adequate normally distributed residuals using logarithm transformation.
+
 hist(spotify$listening_time, breaks=30, main="Histogram of Listening Time", xlab="Listening Time")
-```
 
 ```{r anova_model}
 # Lets fit an ANOVA model with interaction terms for country, gender, device_type
 anova_model <- aov(listening_time ~ country * gender * device_type, data = spotify)
+# Summary of the ANOVA
+summary(anova_model)
+```
+Logarithm trans
+```{r}
+spotify$log_listening_time <- log(spotify$listening_time + 1)
+```
+
+```{r}
+hist(spotify$log_listening_time, breaks=30, main="Histogram of Log-Listening Time", xlab="Log Listening Time")
+```
+
+```{r anova_model}
+# Lets fit an ANOVA model with logarith transformation
+anova_model <- aov(log_listening_time ~ country * gender * device_type, data = spotify)
 # Summary of the ANOVA
 summary(anova_model)
 ```
