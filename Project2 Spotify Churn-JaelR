@@ -43,6 +43,8 @@ xkablesummary(spotify)
 spotify$gender <- as.factor(spotify$gender)
 summary(spotify)
 ```
+This bar plot shows the number of users who churned (canceled subscription) vs. those who did not. 
+Observing this plot gives an overview of the balance between these two groups.
 
 # EDA for device_type 
 ```{r statist_churned}
@@ -51,7 +53,7 @@ ggplot(spotify, aes(x = factor(is_churned), fill = factor(is_churned))) +
   geom_bar() + labs(title = "Churn vs. Non-Churn Count",
                     x = "Churned (1) / Not Churned (0)", y = "User Count")
 ```
-
+Churn rates vary by country; some countries have significantly higher as PK, DE, FR, and  lower cancellation rates like IN. 
 # Churn by country
 
 ```{r ccountry}
@@ -63,7 +65,7 @@ ggplot(churn_country, aes(x = reorder(country, churn_rate), y = churn_rate)) +
   geom_col(fill = "coral") + coord_flip() +
   labs(title = "Churn Rate by Country", x = "Country", y = "Churn Rate")
 ```
-
+Churn rate differences by gender highlight woman presents potential disparities in user retention.
 ```{r gender}
 churn_gender <- spotify %>%
   group_by(gender) %>%
@@ -74,6 +76,7 @@ ggplot(churn_gender, aes(x = gender, y = churn_rate, fill = gender)) +
   labs(title = "Churn Rate by Gender", y = "Churn Rate", x = "Gender")
 ```
 
+Listening time patterns across device types show that heavy mobile users have different churn rates than desktop web users.
 ```{r device_type}
 ggplot(spotify, aes(x = device_type, y = listening_time, fill = factor(is_churned))) +
   geom_boxplot() +
@@ -81,6 +84,9 @@ ggplot(spotify, aes(x = device_type, y = listening_time, fill = factor(is_churne
        x = "Device Type", y = "Listening Time", fill = "Churned")
 ```
 
+The interaction among country, gender, and device type clarifies which groups are more likely to cancel.
+Medians are very similar for both churned and non-churned users across all device types.
+It is visible that the spread and range for listening time are quite similar between churned and non-churned groups on all device types.
 ```{r group_combo}
 churn_combo <- spotify %>%
   group_by(country, gender, device_type) %>%
