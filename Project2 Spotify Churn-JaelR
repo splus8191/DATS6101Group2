@@ -25,11 +25,14 @@ options(scientific=T, digits = 3)
 
 #Opening the file
 ```{r}
-# getwd()
 spotify <- read.csv("C:/Users/Jael Rojas/Documents/MS_DataScience/DataScience/presentation/spotify_churn_dataset.csv", header = TRUE)
 str(spotify)
 head(spotify)
+spotify$gender <- as.factor(spotify$gender)
+spotify$country <- as.factor(spotify$country)
 spotify
+```
+
 ```
 **summary statistics
 #Overview data
