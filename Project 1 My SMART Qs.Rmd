@@ -20,31 +20,10 @@ spotify = read.csv("spotify_churn_dataset.csv", header = TRUE)
 
 ## Converting character to categorical
 
-let's convert `gender`, `country`, `subscription_type`, `device_type`, and `is_churned` to categories
+let's convert `is_churned` to categories
 ```{r}
 spotify$is_churned = factor(spotify$is_churned, levels = c(0, 1), labels = c("active", "churned"))
-spotify$gender = as.factor(spotify$gender)
-spotify$country = as.factor(spotify$country)
-spotify$subscription_type = as.factor(spotify$subscription_type)
-spotify$device_type = as.factor(spotify$device_type)
 ```
-
-## Target balance (is_churned)
-We need to know if churn is rare or common.
-
-```{r}
-tbl = table(spotify$is_churned)
-tbl
-round(100 * prop.table(tbl), 2)
-```
-
-```{r}
-barplot(tbl,
-        main = "Churn balance",
-        ylab = "Count",
-        col = c("gray80","gray40"))
-```
-
 
 # SMART Question X: Do users who skip more songs tend to churn more than users who skip less?
 
@@ -62,6 +41,7 @@ table(spotify$is_churned)
 tapply(spotify$skip_rate, spotify$is_churned, mean)
 tapply(spotify$skip_rate, spotify$is_churned, sd)
 ```
+
 Churned users show a slightly higher skip rate, but the difference looks small.
 
 ## Do churned users skip more? (One-sided Welch t-test)
@@ -78,6 +58,7 @@ t.test(
 )
 
 ```
+
 At α = 0.05: Fail to reject H₀ — the evidence is not sufficient to conclude churned users have a higher mean skip rate.
 
 
@@ -115,4 +96,5 @@ bartlett.test(skip_rate ~ subscription_type, data = spotify)
 ```{r}
 summary(fit)
 ```
+
 One-way ANOVA: F(3, 7996) = 0.48, p = 0.70; we fail to reject equal means at α = 0.05. Any observed differences are small and not statistically detectable in this sample.
