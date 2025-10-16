@@ -452,4 +452,8 @@ plot(anova_model_log)
 #### SMART Question 4 Conclusion: 
 Constant variance is satisfied. Outliers are not present. The normality of residuals is violated because there is a strong deviation from normality in the Q-Q plot. ANOVA is robust to normality violations for large data.
 
+
 The significant effect of device_type indicates how it influences a user's listening time. The absence of significance for country and gender suggests that these factors do not have a strong impact on listening time. The non-significant interaction effects indicate that device type on listening time is consistent across different countries and genders.
+
+Although no significant relationships were found between individual categorical variables and churn, with p-values not reaching conventional levels of significance (all p > 0.2), exploring interactions between multiple categorical variables revealed some potential associations. Specifically, the interaction between country and gender when crossed with device type suggested relations worthy of further exploration. Statistical tests comparing means and variances across groups consistently showed similar results, indicating no significant differences in these measures. These findings suggest that while single factors alone may not significantly predict churn, combinations of variables could provide more insight, highlighting the importance of considering interactions in churn analysis.
+
