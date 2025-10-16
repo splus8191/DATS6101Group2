@@ -146,6 +146,8 @@ summary(anovatestsongs)
 With a p-value of 0.4, we fail to reject the null hypothesis. This indicates that there is insufficient evidence to conclude that songs played per day has a statistically significant relationship with whether a given user will churn.
 
 To investigate a little further with the impact of songs played per day to make sure we covered all of our bases with this variable, we created a new factor variable called listening_category. We are interested in examining whether there are any relationships among churn with different intensities of song listeners.
+
+### Creating Listening Category Bins
 ```{r}
 spotify$listening_category <- cut(spotify$songs_played_per_day,
                                    breaks = c(1, 33, 66, 99),
@@ -161,6 +163,8 @@ tapply(spotify$is_churned==1,
        mean)
 ```
 After looking at the chart, we can see that family plan users who had low listening churned the most at 29.3%. Student plan users with low listening churned the least at 23.9%. However, is this statistically significant, or are any of these results statistically significant? We start with a box plot and bar chart of the songs played per day or listening categories from the lens of subscription type.
+
+### Graphs for Listening Category, Subscription Type, and Songs Played Per Day
 ```{r Box Plot & Bar Plot: Subscription Type, Songs Played Per Day, and Listening Category}
 ggplot(spotify, aes(x = subscription_type, y = songs_played_per_day)) +
   geom_boxplot() +
