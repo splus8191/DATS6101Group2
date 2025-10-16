@@ -27,7 +27,7 @@ spotify$is_churned = factor(spotify$is_churned, levels = c(0, 1), labels = c("ac
 
 # SMART Question X: Do users who skip more songs tend to churn more than users who skip less?
 
-## EDA for that spotifyecific question**
+## EDA for that spotifyecific question
 
 ```{r}
 library(ggplot2)
@@ -63,7 +63,7 @@ At α = 0.05: Fail to reject H₀ — the evidence is not sufficient to conclude
 
 
 
-# SMART Question X: Do different subscription types (Free, Premium, Family, Student) influence users’ skip rates on spotifyotify?
+# SMART Question X: Do different subscription types (Free, Premium, Family, Student) influence users’ skip rates on spotify?
 
 ## ANOVA compare means across 3+ groups (quantitative ~ categorical)
 
