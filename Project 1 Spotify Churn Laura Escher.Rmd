@@ -26,10 +26,18 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r - Investigating the data set variables (added Adam's stuff here)}
+```{r setup and loading packages}
 library(ggplot2)
 library(dplyr)
+library(tidyr)
+library(ezids)
+library(car)
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 
+options(scientific=T, digits = 3)
+```
+# EDA For the Dataset
+```{r}
 spotify <- read.csv("C:/Users/esche/OneDrive - The George Washington University/Intro to Data Science/Data Science Project 1/spotify_churn_dataset.csv")
 
 str(spotify)
@@ -47,7 +55,7 @@ boxplot.stats(spotify$listening_time)$out
 boxplot.stats(spotify$offline_listening)$out
 ```
 
-I first opened up the file and examined the data using the str() function. I checked to see if there are any missing values in the data, which there are none. There are 8000 observations in this data set, and 12 variables. The variables are:
+We first opened up the file and examined the data using the str() function. We checked to see if there are any missing values in the data, which there are none. There are 8000 observations in this data set, and 12 variables. The variables are:
 
 Variable  |  Definition
 
@@ -64,9 +72,41 @@ Variable  |  Definition
 - offline_listening | Offline mode usage (indicator variable. 0 for no offline mode usage, 1 for offline mode usage)
 - is_churned (indicator variable. 0 for no churn, 1 for churn)
 
-# Heatmap plot
+## Data split
 ```{r}
-library(ggplot2)
+churnedSpotifyData <- spotifyData[spotifyData$is_churned == 1,]
+activeSpotifyData <- spotifyData[spotifyData$is_churned == 0,]
+activeSpotifyData <- spotifyData[spotifyData$is_churned == 0,]
+```
+### Select only numeric columns and remove IDs
+```{r}
+churned_numeric <- churnedSpotifyData[ , sapply(churnedSpotifyData, is.numeric)]
+active_numeric  <- activeSpotifyData[ , sapply(activeSpotifyData, is.numeric)]
+active_numeric  <- activeSpotifyData[ , sapply(activeSpotifyData, is.numeric)]
+churned_numeric$user_id <- NULL
+active_numeric$user_id <- NULL
+active_numeric$user_id <- NULL
+churned_numeric$is_churned <- NULL
+active_numeric$is_churned <- NULL
+active_numeric$is_churned <- NULL
+```
+### Group means
+```{r}
+churned_means <- colMeans(churned_numeric, na.rm = TRUE)
+active_means  <- colMeans(active_numeric, na.rm = TRUE)
+active_means  <- colMeans(active_numeric, na.rm = TRUE)
+```
+### Differences
+```{r}
+diff_vec <- churned_means - active_means
+diff_vec <- churned_means - active_means
+spotifydiffdf <- data.frame(
+  Feature = names(diff_vec),
+  Difference = as.numeric(diff_vec)
+)
+```
+### Heatmap plot
+```{r}
 ggplot(spotifydiffdf, aes(x = Feature, y = 1, fill = Difference)) +
   geom_tile(color = "white", height = 1) +
   scale_fill_gradient2(low = "red", mid = "white", high = "blue") +
@@ -75,18 +115,17 @@ ggplot(spotifydiffdf, aes(x = Feature, y = 1, fill = Difference)) +
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank())
 ```
-Even if visual differences seem marginal, this heatmap highlights where churned users differ numerically from actives. 
-
-The SMART question that I would like to consider is, "Do free users churn at a higher rate compared to premium, family, or student users?" To accomplish this goal, I will perform EDA on this portion of the data.
+Even if visual differences seem marginal, this heat map highlights where churned users differ numerically from actives. 
 
 # SMART Question 1: Do free users churn at a higher rate compared to premium, family, or student users?
+The SMART question that we would like to consider first is, "Do free users churn at a higher rate compared to premium, family, or student users?" To accomplish this goal, we will perform EDA on this portion of the data.
 
 ## EDA for Subscription Type
 ```{r}
 spotify$subscription_type <- as.factor(spotify$subscription_type)
 summary(spotify$subscription_type)
 ```
-## Mean Churn by Subscription Type
+### Mean Churn by Subscription Type
 
 Now, let's calculate the sample percentage of users who churned based on subscription type as part of our descriptive statistics.
 ```{r}
@@ -150,7 +189,7 @@ for(var in categorical_vars) {
 ```
 After running the chi-square tests for independence to examine the relationship between each categorical variable and churn, we did not find statistically significant results at the 10% significance level. When examined individually, gender, subscription_type, country, device_type, and offline_listening did not show a significant association with whether a given user will churn.
 
-## Songs Played Per Day, Subscription Type, and Churn tests and graphs
+# SMART Question 2: Is there an association between the number of songs played per day and whether a Spotify user churns?
 
 What if the number of songs played per day and a user's subscription type has something to do with whether they will churn? We investigate below.
 
@@ -158,7 +197,9 @@ What if the number of songs played per day and a user's subscription type has so
 max(spotify$songs_played_per_day)
 min(spotify$songs_played_per_day)
 ```
-The minimum number of songs played per day are 1 and the maximum songs played per day are 99. There might be a relationship here! First, let's test whether songs played per day has a relationship with whether someone churns. We use an ANOVA test because we are comparing a quantitative variable (songs played per day) with a factor variable (churn).
+The minimum number of songs played per day are 1 and the maximum songs played per day are 99. There might be a relationship here!
+## ANOVA Test for Songs Played Per Day and Churn
+First, let's test whether songs played per day has a relationship with whether someone churns. We use an ANOVA test because we are comparing a quantitative variable (songs played per day) with a factor variable (churn).
 ```{r}
 anovatestsongs = aov(songs_played_per_day ~ is_churned, data=spotify)
 summary(anovatestsongs)
@@ -234,7 +275,8 @@ spotify %>%
 With a p-value of 0.6, the results are not statistically significant and these variables are unsurprisingly independent from one another.
 
 # SMART Question 3: Which country has the highest rate of churn users? Which has the lowest?
-For this question, I felt as if the demographics of each country could make a difference. My theory is that countries of lesser income will be more likely to churn. 
+
+For this question, we felt as if the demographics of each country could make a difference. Our theory is that countries of lesser income will be more likely to churn. 
 ```{r}
 unique(spotify$gender)
 ```
@@ -265,7 +307,7 @@ comparison <- comparison %>%
 )
 ```
 
-```{r Adam plots}
+```{r}
 ggplot(comparison, aes(x = country, y = ratio)) +
   geom_col(fill = "red") +
   labs(
@@ -292,3 +334,122 @@ actual_positions <- seq_along(actualrankings)
 
 cor(predicted_positions, actual_positions, method = "spearman")
 ```
+
+#SMART Question 4: Do users churn significantly depending on the listening time, country, gender and device type used?
+
+```{r statist_gender}
+xkablesummary(spotify)
+spotify$gender <- as.factor(spotify$gender)
+spotify$country <- as.factor(spotify$country)
+summary(spotify)
+```
+This bar plot shows the number of users who churned (canceled subscription) vs. those who did not. 
+Observing this plot gives an overview of the balance between these two groups.
+
+## EDA for device_type 
+```{r statist_churned}
+table(spotify$is_churned)
+ggplot(spotify, aes(x = factor(is_churned), fill = factor(is_churned))) +
+  geom_bar() + labs(title = "Churn vs. Non-Churn Count",
+                    x = "Churned (1) / Not Churned (0)", y = "User Count")
+```
+Churn rates vary by country; some countries have significantly higher as PK, DE, FR, and  lower cancellation rates like IN.
+
+## Churn by country
+
+```{r country}
+churn_country <- spotify %>%
+  group_by(country) %>%
+  summarise(churn_rate = mean(is_churned), count = n())
+
+ggplot(churn_country, aes(x = reorder(country, churn_rate), y = churn_rate)) +
+  geom_col(fill = "coral") + coord_flip() +
+  labs(title = "Churn Rate by Country", x = "Country", y = "Churn Rate")
+```
+Churn rate differences by gender highlight how women present a potential disparity in user retention.
+```{r gender}
+churn_gender <- spotify %>%
+  group_by(gender) %>%
+  summarise(churn_rate = mean(is_churned), count = n())
+
+ggplot(churn_gender, aes(x = gender, y = churn_rate, fill = gender)) +
+  geom_col() +
+  labs(title = "Churn Rate by Gender", y = "Churn Rate", x = "Gender")
+```
+Listening time patterns across device types show that heavy mobile users have different churn rates than desktop web users.
+
+```{r device_type}
+ggplot(spotify, aes(x = device_type, y = listening_time, fill = factor(is_churned))) +
+  geom_boxplot() +
+  labs(title = "Churn Status : Listening Time by Device Type",
+       x = "Device Type", y = "Listening Time", fill = "Churned")
+```
+
+The interaction among country, gender, and device type clarifies which groups are more likely to cancel.
+Medians are very similar for both churned and non-churned users across all device types.
+It is visible that the spread and range for listening time are quite similar between churned and non-churned groups on all device types.
+
+The mean listening time for female users in Pakistan is lower than for females in Germany (desktop device type).
+Female churn rates are highest in Pakistan, Germany, and France across device types, especially in desktop and web usage.
+For females, higher listening on mobile devices corresponds to higher churn.
+
+Conclusion: Female Spotify users who listen more on mobile devices tend to have higher churn rates, especially in Pakistan, Germany, and France.
+In Pakistan, female users generally have lower average listening times than in Germany, but still present a high churn risk on desktop.
+
+```{r group_combo}
+churn_combo <- spotify %>%
+  group_by(country, gender, device_type) %>%
+  summarise(churn_rate = mean(is_churned), mean_listening = mean(listening_time), count=n())
+
+ggplot(churn_combo, aes(x = device_type, y = churn_rate, color = gender)) +
+  geom_point(aes(size = mean_listening)) +
+  facet_wrap(~country) +
+  labs(title = "Churn Rate by Country, Gender, Device Type",
+       x = "Device Type", y = "Churn Rate")
+```
+
+## ANOVA Hypothesis Test
+First, we will check the distribution of listening_time. From the shape, we do not have a normal distribution. We fail to reject that we have normally distributed residuals. Therefore, we use a logarithm transformation later in this section to help make listening_time more normally distributed.
+
+```{r}
+hist(spotify$listening_time, breaks=30, main="Histogram of Listening Time", xlab="Listening Time")
+```
+Let's fit an ANOVA model with interaction terms for country, gender, and device_type.
+```{r anova_model}
+anova_model <- aov(listening_time ~ country * gender * device_type, data = spotify)
+```
+### Summary of the ANOVA Tests
+```{r}
+summary(anova_model)
+par(mfrow=c(2,2))
+plot(anova_model)
+```
+### Logarithm transformation
+```{r}
+spotify$log_listening_time <- log(spotify$listening_time + 1)
+```
+
+```{r}
+hist(spotify$log_listening_time, breaks=30, main="Histogram of Log-Listening Time", xlab="Log Listening Time")
+```
+Let's fit an ANOVA model with logarithm transformation
+```{r anova_model}
+anova_model_log <- aov(log_listening_time ~ country * gender * device_type, data = spotify)
+```
+Here is a summary of the ANOVA test using the logarithm transformation.
+```{r}
+summary(anova_model_log)
+```
+The p-values are  high (0.9365 and 0.9212), indicating no statistically significant effect of country, gender, or listening time. 
+Device_type: p-value is 0.0067, meaning there is statistically significant evidence that device type affects listening time.
+With the following interactions between country:gender, country:device_type, and gender:device_type, we find high p-values (> 0.3), indicating no significant interactions.
+
+Below are diagnostic plots to validate the ANOVA test using the logarithm transformation.
+```{r}
+par(mfrow=c(2,2))
+plot(anova_model_log)
+```
+#### SMART Question 4 Conclusion: 
+Constant variance is satisfied. Outliers are not present. The normality of residuals is violated because there is a strong deviation from normality in the Q-Q plot. ANOVA is robust to normality violations for large data.
+
+The significant effect of device_type indicates how it influences a user's listening time. The absence of significance for country and gender suggests that these factors do not have a strong impact on listening time. The non-significant interaction effects indicate that device type on listening time is consistent across different countries and genders.
