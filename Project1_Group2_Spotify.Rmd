@@ -1,6 +1,6 @@
 ---
 title: "Project 1 Spotify Churn Data Science"
-authors: "Adam Burke, Laura Escher,Jael Rojas, Muhannad Alhamoudi "
+authors: "Adam Burke, Laura Escher, Jael Rojas, Muhannad Alhamoudi "
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -46,7 +46,6 @@ glimpse(spotify)
 
 colSums(is.na(spotify))
 
-
 cor(spotify[sapply(spotify, is.numeric)], use = "complete.obs")
 
 boxplot.stats(spotify$age)$out
@@ -54,7 +53,7 @@ boxplot.stats(spotify$listening_time)$out
 boxplot.stats(spotify$offline_listening)$out
 ```
 
-We first opened up the file and examined the data using the str() function. We checked to see if there are any missing values in the data, which there are none. There are 8000 observations in this data set, and 12 variables. The variables are:
+We first opened up the file and examined the data using the glimpse() function. We checked to see if there are any missing values in the data, which there are none. There are 8000 observations in this data set, and 12 variables. The variables are:
 
 Variable  |  Definition
 
@@ -320,6 +319,10 @@ churnedcount <- table(churnedSpotifyData$country)
 activecount  <- table(activeSpotifyData$country)
 ```
 
+
+In this we build our tables, it is important to do this correctly do this and union the features. 
+We then mutate it building on top of it using are already available columns. 
+
 ```{r}
 comparison <- data.frame(
   country = union(names(churnedcount), names(activecount)),
@@ -333,6 +336,8 @@ comparison <- comparison %>%
 )
 ```
 
+We plot our results. Seems minimal.
+
 ```{r}
 ggplot(comparison, aes(x = country, y = ratio)) +
   geom_col(fill = "red") +
@@ -341,6 +346,8 @@ ggplot(comparison, aes(x = country, y = ratio)) +
     y = "Ratio"
   ) 
 ```
+
+We make lists of our results and our prediction to get a numerical score back on the accuracy. 
 
 ```{r}
 dense_ranks <- dense_rank(comparison$ratio)
@@ -575,3 +582,6 @@ summary(fit)
 ```
 
 One-way ANOVA: F(3, 7996) = 0.48, p = 0.70; we fail to reject equal means at α = 0.05. Any observed differences are small and not statistically detectable in this sample.
+
+Conclusion:
+We are of the opinion that this data is heavily artificial and lacks any correlations that might be reflective of world data. In terms of the future, it is important to look at the data before diving in , and maybe to get the data from direct sources(web scraping). Simply looking at the correlation matrix, any trend is heavily lacking. We further drew from outside sources, such as looking at the average income by country. We further built upon this by using our SMART questions to have a further look at the data. This built further upon the idea that data lacks any remarkable features. 
