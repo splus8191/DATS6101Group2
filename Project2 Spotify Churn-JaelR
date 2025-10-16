@@ -160,3 +160,6 @@ ANOVA  is  robust  to normality violations for large data.
 The significant effect of device_type indicates that how it influences their listening time.
 The absence of significance for country, gender,  suggests these factors do not have a strong impact on listening time.
 The non-significant interaction effects indicate that device type on listening time is consistent across different countries and genders.
+
+Reference:
+nabihazahid. (2025). Spotify dataset for churn analysis. Kaggle. https://www.kaggle.com/datasets/nabihazahid/spotify-dataset-for-churn-analysis/data
