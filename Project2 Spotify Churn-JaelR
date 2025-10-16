@@ -23,6 +23,7 @@ library(tidyr)
 options(scientific=T, digits = 3) 
 # options(scipen=9, digits = 3) 
 ```
+SMART QUESTION: Do users churn significantly depending on the listening time, country, gender and device type used? 
 
 #Opening the file
 ```{r}
