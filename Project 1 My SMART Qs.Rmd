@@ -51,7 +51,6 @@ barplot(tbl,
 ## EDA for that spotifyecific question**
 
 ```{r}
-# Boxplot
 library(ggplot2)
 ggplot(spotify, aes(x = is_churned, y = skip_rate)) +
   geom_boxplot() +
@@ -59,7 +58,6 @@ ggplot(spotify, aes(x = is_churned, y = skip_rate)) +
 ```
 
 ```{r}
-# Means & SDs by churn group (prints a clear 2x2 table)
 table(spotify$is_churned)
 tapply(spotify$skip_rate, spotify$is_churned, mean)
 tapply(spotify$skip_rate, spotify$is_churned, sd)
@@ -75,8 +73,8 @@ Churned users show a slightly higher skip rate, but the difference looks small.
 t.test(
   skip_rate ~ is_churned,
   data = spotify,
-  alternative = "greater",  # tests μ_churned − μ_active > 0
-  var.equal = FALSE         # Welch (safer)
+  alternative = "greater",
+  var.equal = FALSE
 )
 
 ```
@@ -92,17 +90,16 @@ Quick visuals + group summaries (EDA before ANOVA)
 
 ```{r}
 
-# Boxplot by group
 ggplot(spotify, aes(x = subscription_type, y = skip_rate)) +
   geom_boxplot() +
   coord_flip() +
   labs(title = "Skip rate by subscription type", x = NULL, y = "Skip rate")
 
-# Group means/SDs (to describe size/direction)
 tapply(spotify$skip_rate, spotify$subscription_type, mean)
 tapply(spotify$skip_rate, spotify$subscription_type, sd)
 table(spotify$subscription_type)
 ```
+Mean skip_rate was very similar across subscription types (Family 0.300, Free 0.301, Premium 0.297, Student 0.303).
 
 ```{r}
 # Fit once so we can get residuals
@@ -118,5 +115,4 @@ bartlett.test(skip_rate ~ subscription_type, data = spotify)
 ```{r}
 summary(fit)
 ```
-
-Mean skip_rate was very similar across subscription types (Family 0.300, Free 0.301, Premium 0.297, Student 0.303). One-way ANOVA: F(3, 7996) = 0.48, p = 0.70; we fail to reject equal means at α = 0.05. Any observed differences are small and not statistically detectable in this sample.
+One-way ANOVA: F(3, 7996) = 0.48, p = 0.70; we fail to reject equal means at α = 0.05. Any observed differences are small and not statistically detectable in this sample.
