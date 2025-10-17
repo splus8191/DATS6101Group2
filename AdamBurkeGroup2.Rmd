@@ -1,0 +1,126 @@
+---
+title: "Project 1 Spotify Churn Data Science"
+author: "Adam Burke"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+# Some of common RMD options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+knitr::opts_chunk$set(results="markup", warning = F, message = F)
+options(scientific=T, digits = 3) 
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r - Investigating the data set variables}
+library(ggplot2)
+library(dplyr)
+
+spotify <- read.csv("C:/Users/Adam/Downloads/spotify_churn_dataset.csv")
+
+glimpse(spotify)
+
+colSums(is.na(spotify))
+
+cor(spotify[sapply(spotify, is.numeric)], use = "complete.obs")
+
+boxplot.stats(spotify$age)$out
+boxplot.stats(spotify$listening_time)$out
+boxplot.stats(spotify$offline_listening)$out
+```
+I first opened up the file and examined the data using the str() function. I checked to see if there are any missing values in the data, which there are none. There are 8000 observations in this data set, and 12 variables. The variables are:
+
+Variable  |  Definition
+
+user_id | Unique identifier for each user
+gender | User gender (Male/Female/Other)
+age | User age
+country | User location
+subscription_type | Type of Spotify subscription (Free, Premium, Family, Student)
+listening_time | Minutes spent listening per day
+songs_played_per_day | Number of songs played daily
+skip_rate | Percentage of songs skipped
+device_type | Device used (Mobile, Desktop, Web)
+ads_listened_per_week | Number of ads heard per week
+offline_listening | Offline mode usage (indicator variable. 0 for no offline mode usage, 1 for offline mode usage)
+is_churned (indicator variable. 0 for no churn, 1 for churn)
+
+# Heatmap plot
+library(ggplot2)
+ggplot(spotifydiffdf, aes(x = Feature, y = 1, fill = Difference)) +
+  geom_tile(color = "white", height = 1) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "blue") +
+  labs(title = "Difference Heatmap: Churned is Blue, Active is Red", y = NULL, x = "Feature") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank())
+
+Even if visual differences seem marginal, this heatmap highlights where churned users differ numerically from actives. 
+
+
+#Smart Question, Country with highest churn rate and lowest
+For this question, I felt as if the demographics of each country could make a difference. My theory is that countries of lesser income will be more likely to churn. 
+
+unique(spotify$gender)
+
+
+Now lets look at average income by country
+US:83700  CA:63500  AU:65000  FR:47000  
+DE:44000  UK:37000  IN:4500  PK:3500
+
+Now the prediction should be that the higher the income the lower the churn rate. Lets test that prediction. 
+
+table(churnedSpotifyData$country)
+table(activeSpotifyData$country)
+
+churnedcount <- table(churnedSpotifyData$country)
+activecount  <- table(activeSpotifyData$country)
+
+comparison <- data.frame(
+  country = union(names(churnedcount), names(activecount)),
+  churned = as.numeric(churnedcount[union(names(churnedcount), names(activecount))]),
+  active  = as.numeric(activecount[union(names(churnedcount), names(activecount))])
+)
+
+comparison <- comparison %>%
+  mutate(ratio = churned / active,
+  dense_rank = dense_rank(ratio)
+)
+
+ggplot(comparison, aes(x = country, y = ratio)) +
+  geom_col(fill = "red") +
+  labs(
+    title = "Churned to Active Ratio by Country",
+    y = "Ratio"
+  ) 
+ggplot(world_data, aes(fill = churn_ratio)) +
+  geom_sf() +
+  labs(title = "Global Churn Ratio by Country")
+  
+dense_ranks <- dense_rank(comparison$ratio)
+
+actualrankings <- c("IN","UK","CA","US","AU","FR","DE","PK")
+
+predictrankings <- c("US","CA","AU","FR","DE","UK","IN","PK")
+
+sum(predictrankings == actualrankings)
+
+
+predicted_positions <- match(predictrankings, actualrankings)
+actual_positions <- seq_along(actualrankings)
+
+cor(predicted_positions, actual_positions, method = "spearman")
+
+

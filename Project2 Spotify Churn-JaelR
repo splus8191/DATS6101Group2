@@ -1,0 +1,165 @@
+---
+title: "Project Spotify analysis"
+author: "Jael Rojas"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+  code_folding: hide
+number_sections: false
+toc: yes
+toc_depth: 3
+toc_float: yes
+pdf_document:
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# Can globally set option for number display format.
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+```
+SMART QUESTION: Do users churn significantly depending on the listening time, country, gender and device type used? 
+
+#Opening the file
+```{r}
+spotify <- read.csv("C:/Users/Jael Rojas/Documents/MS_DataScience/DataScience/presentation/spotify_churn_dataset.csv", header = TRUE)
+str(spotify)
+head(spotify)
+spotify$gender <- as.factor(spotify$gender)
+spotify$country <- as.factor(spotify$country)
+spotify
+```
+
+```
+**summary statistics
+#Overview data
+
+```{r statist_gender}
+library(ezids)
+xkablesummary(spotify)
+spotify$gender <- as.factor(spotify$gender)
+summary(spotify)
+```
+This bar plot shows the number of users who churned (canceled subscription) vs. those who did not. 
+Observing this plot gives an overview of the balance between these two groups.
+
+# EDA for device_type 
+```{r statist_churned}
+table(spotify$is_churned)
+ggplot(spotify, aes(x = factor(is_churned), fill = factor(is_churned))) +
+  geom_bar() + labs(title = "Churn vs. Non-Churn Count",
+                    x = "Churned (1) / Not Churned (0)", y = "User Count")
+```
+Churn rates vary by country; some countries have significantly higher as PK, DE, FR, and  lower cancellation rates like IN. 
+# Churn by country
+
+```{r ccountry}
+churn_country <- spotify %>%
+  group_by(country) %>%
+  summarise(churn_rate = mean(is_churned), count = n())
+
+ggplot(churn_country, aes(x = reorder(country, churn_rate), y = churn_rate)) +
+  geom_col(fill = "coral") + coord_flip() +
+  labs(title = "Churn Rate by Country", x = "Country", y = "Churn Rate")
+```
+Churn rate differences by gender highlight woman presents potential disparities in user retention.
+```{r gender}
+churn_gender <- spotify %>%
+  group_by(gender) %>%
+  summarise(churn_rate = mean(is_churned), count = n())
+
+ggplot(churn_gender, aes(x = gender, y = churn_rate, fill = gender)) +
+  geom_col() +
+  labs(title = "Churn Rate by Gender", y = "Churn Rate", x = "Gender")
+```
+
+Listening time patterns across device types show that heavy mobile users have different churn rates than desktop web users.
+```{r device_type}
+ggplot(spotify, aes(x = device_type, y = listening_time, fill = factor(is_churned))) +
+  geom_boxplot() +
+  labs(title = "Churn Status : Listening Time by Device Type",
+       x = "Device Type", y = "Listening Time", fill = "Churned")
+```
+
+The interaction among country, gender, and device type clarifies which groups are more likely to cancel.
+Medians are very similar for both churned and non-churned users across all device types.
+It is visible that the spread and range for listening time are quite similar between churned and non-churned groups on all device types.
+
+The mean listening time for female users in Pakistan is lower than for females in Germany(desktop device type).
+Female churn rates are mostly the highest in Pakistan, Germany, and France across device types, especially in desktop and web usage.
+ For females, higher listening on mobile devices corresponds to higher churn.
+
+Conclusion: Female Spotify users who listen more on mobile devices tend to have higher churn rates, especially in Pakistan, Germany, and France.
+In Pakistan, female users generally have lower average listening times than in Germany, but still present a high churn risk on desktop.
+
+```{r group_combo}
+churn_combo <- spotify %>%
+  group_by(country, gender, device_type) %>%
+  summarise(churn_rate = mean(is_churned), mean_listening = mean(listening_time), count=n())
+
+ggplot(churn_combo, aes(x = device_type, y = churn_rate, color = gender)) +
+  geom_point(aes(size = mean_listening)) +
+  facet_wrap(~country) +
+  labs(title = "Churn Rate by Country, Gender, Device Type",
+       x = "Device Type", y = "Churn Rate")
+```
+
+#ANOVA Hypotesis Test
+
+```{r anovat}
+library(car)  
+
+#First we will check the distribution of listening_time. From the shape we does not have normal distribution, 
+for nonviolate we adequate normally distributed residuals using logarithm transformation.
+
+hist(spotify$listening_time, breaks=30, main="Histogram of Listening Time", xlab="Listening Time")
+
+```{r anova_model}
+# Lets fit an ANOVA model with interaction terms for country, gender, device_type
+anova_model <- aov(listening_time ~ country * gender * device_type, data = spotify)
+# Summary of the ANOVA
+summary(anova_model)
+```
+The p-values are  high (0.9365 and 0.9212), indicating no statistically significant effect of country, gender, or listening time. 
+Device_type: p-value is 0.0067 , meaning there is statistically significant evidence that device type affects listening time.
+country:gender, country:device_type, gender:device_type, have high p-values (> 0.3), indicating no significant interactions.
+
+Logarithm trans
+```{r}
+spotify$log_listening_time <- log(spotify$listening_time + 1)
+```
+
+```{r}
+hist(spotify$log_listening_time, breaks=30, main="Histogram of Log-Listening Time", xlab="Log Listening Time")
+```
+
+```{r anova_model}
+# Lets fit an ANOVA model with logarith transformation
+anova_model <- aov(log_listening_time ~ country * gender * device_type, data = spotify)
+# Summary of the ANOVA
+summary(anova_model)
+```
+
+```{r anovad}
+# Diagnostic plots to validate ANOVA
+par(mfrow=c(2,2))
+plot(anova_model)
+```
+#Conclusion: 
+Constant variance: Satisfied.
+Outliers: Not present.
+Normality of residuals: Violated (strong deviation from normality in the Q-Q plot).
+
+ANOVA  is  robust  to normality violations for large data.
+
+The significant effect of device_type indicates that how it influences their listening time.
+The absence of significance for country, gender,  suggests these factors do not have a strong impact on listening time.
+The non-significant interaction effects indicate that device type on listening time is consistent across different countries and genders.
+
+Reference:
+nabihazahid. (2025). Spotify dataset for churn analysis. Kaggle. https://www.kaggle.com/datasets/nabihazahid/spotify-dataset-for-churn-analysis/data
