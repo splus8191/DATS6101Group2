@@ -1,0 +1,172 @@
+SEQN - Respondent sequence number: Respondent sequence number.
+SDDSRVYR - Data release cycle: Data release cycle.
+RIDSTATR - Interview and examination status of the participant: Interview and examination status of the participant.
+RIAGENDR - Gender of the participant: Gender of the participant.
+RIDAGEYR - Age in years of the participant at the time of screening. Individuals 80 and over are topcoded at 80 years of age: Age in years of the participant at the time of screening. Individuals 80 and over are topcoded at 80 years of age.
+RIDAGEMN - Age in months of the participant at the time of screening. Reported for persons aged 24 months or younger at the time of exam (or screening if not examined): Age in months of the participant at the time of screening. Reported for persons aged 24 months or younger at the time of exam (or screening if not examined).
+RIDRETH1 - Recode of reported race and Hispanic origin information: Recode of reported race and Hispanic origin information.
+RIDRETH3 - Recode of reported race and Hispanic origin information, with Non-Hispanic Asian Category: Recode of reported race and Hispanic origin information, with Non-Hispanic Asian Category.
+RIDEXMON - Six month time period when the examination was performed - two categories: November 1 through April 30, May 1 through October 31: Six month time period when the examination was performed - two categories: November 1 through April 30, May 1 through October 31.
+RIDEXAGM - Age in months at exam (screener): Age in months at exam for participants aged 0-19 years.
+DMQMILIZ - Veteran/Military status: Served in the US Armed Forces.
+DMQADFC - Active duty in armed forces: Served on active duty in US Armed Forces.
+DMDBORN4 - In what country {were you/was SP} born?: In what country {were you/was SP} born?.
+DMDCITZN - Citizenship status: Citizenship status.
+DMDYRSUS - Length of time in US: Length of time the participant has been in the US.
+DMDEDUC3 - Education level - Children/Youth 6-19: Highest grade or level of school completed for youth.
+DMDEDUC2 - What is the highest grade or level of school {you have/SP has} completed or the highest degree {you have/s/he has} received?: What is the highest grade or level of school {you have/SP has} completed or the highest degree {you have/s/he has} received?.
+DMDMARTL - Marital status: Marital status.
+RIDEXPRG - Pregnancy status for females between 20 and 44 years of age at the time of MEC exam: Pregnancy status for females between 20 and 44 years of age at the time of MEC exam.
+SIALANG - Language of the Sample Person Interview Instrument: Language of the Sample Person Interview Instrument.
+SIAPROXY - Was a Proxy respondent used in conducting the Sample Person (SP) interview?: Was a Proxy respondent used in conducting the Sample Person (SP) interview?.
+SIAINTRP - Was an interpreter used to conduct the Sample Person (SP) interview?: Was an interpreter used to conduct the Sample Person (SP) interview?.
+FIALANG - Language of the Family Interview Instrument: Language of the Family Interview Instrument.
+FIAPROXY - Was a Proxy respondent used in conducting the Family Interview?: Was a Proxy respondent used in conducting the Family Interview?.
+FIAINTRP - Was an interpreter used to conduct the Family interview?: Was an interpreter used to conduct the Family interview?.
+MIALANG - Language of the MEC CAPI Interview Instrument: Language of the MEC CAPI Interview Instrument.
+MIAPROXY - Was a Proxy respondent used in conducting the MEC CAPI Interview?: Was a Proxy respondent used in conducting the MEC CAPI Interview?.
+MIAINTRP - Was an interpreter used to conduct the MEC CAPI interview?: Was an interpreter used to conduct the MEC CAPI interview?.
+AIALANGA - Language of the MEC ACASI Interview Instrument: Language of the MEC ACASI Interview Instrument.
+DMDHHSIZ - Total number of people in the Household: Total number of people in the Household.
+DMDFMSIZ - Total number of people in the Family: Total number of people in the Family.
+DMDHHSZA - Number of children aged 5 years or younger in the household: Number of children aged 5 years or younger in the household.
+DMDHHSZB - Number of children aged 6-17 years old in the household: Number of children aged 6-17 years old in the household.
+DMDHHSZE - Number of adults aged 60 years or older in the household: Number of adults aged 60 years or older in the household.
+DMDHRGND - Gender of the household reference person: Gender of the household reference person.
+DMDHRAGZ - Age of the household reference person: Age of the household reference person.
+DMDHREDZ - Education level of household reference person: Education level of household reference person.
+DMDHRMAZ - Marital status of household reference person: Marital status of household reference person.
+DMDHSEDZ - Education level of household reference person's spouse: Education level of household reference person's spouse.
+WTINT2YR - Full sample 2 year interview weight: Full sample 2 year interview weight.
+WTMEC2YR - Full sample 2 year MEC exam weight: Full sample 2 year MEC exam weight.
+SDMVPSU - Masked variance unit pseudo-PSU variable for variance estimation: Masked variance unit pseudo-PSU variable for variance estimation.
+SDMVSTRA - Masked variance unit pseudo-stratum variable for variance estimation: Masked variance unit pseudo-stratum variable for variance estimation.
+INDHHIN2 - Annual household income: Annual household income.
+INDFMIN2 - Annual family income: Annual family income.
+INDFMPIR - A ratio of family income to poverty guidelines: A ratio of family income to poverty guidelines.
+BMDSTATS - Body Measures Component status Code: Body Measures Component status Code.
+BMXWT - Weight (kg): Weight (kg).
+BMIWT - Comment code for weight: Comment code for weight.
+BMXRECUM - Recumbent Length (cm): Recumbent Length (cm).
+BMIRECUM - Comment code for recumbent length: Comment code for recumbent length.
+BMXHEAD - Head Circumference (cm): Head Circumference (cm).
+BMIHEAD - Comment code for head circumference: Comment code for head circumference.
+BMXHT - Standing Height (cm): Standing Height (cm).
+BMIHT - Comment code for standing height: Comment code for standing height.
+BMXBMI - Body Mass Index (kg/m**2): Body Mass Index (kg/m**2).
+BMXLEG - Upper Leg Length (cm): Upper Leg Length (cm).
+BMILEG - Comment code for upper leg length: Comment code for upper leg length.
+BMXARML - Upper Arm Length (cm): Upper Arm Length (cm).
+BMIARML - Comment code for upper arm length: Comment code for upper arm length.
+BMXARMC - Arm Circumference (cm): Arm Circumference (cm).
+BMIARMC - Comment code for arm circumference: Comment code for arm circumference.
+BMXWAIST - Waist Circumference (cm): Waist Circumference (cm).
+BMIWAIST - Comment code for waist circumference: Comment code for waist circumference.
+BMXHIP - Hip Circumference (cm): Hip Circumference (cm).
+BMIHIP - Comment code for hip circumference: Comment code for hip circumference.
+PAQ605 - Does your/SP's work involve vigorous-intensity activity that causes large increases in breathing or heart rate like carrying or lifting heavy loads, digging or construction work for at least 10 minutes continuously?: Does your/SP's work involve vigorous-intensity activity that causes large increases in breathing or heart rate like carrying or lifting heavy loads, digging or construction work for at least 10 minutes continuously?
+PAQ610 - In a typical week, on how many days do you/does SP do vigorous-intensity activities as part of your/his/her work?: In a typical week, on how many days do you/does SP do vigorous-intensity activities as part of your/his/her work?
+PAD615 - How much time do you/does SP spend doing vigorous-intensity activities at work on a typical day?: How much time do you/does SP spend doing vigorous-intensity activities at work on a typical day?
+PAQ620 - Does your/SP's work involve moderate-intensity activity that causes small increases in breathing or heart rate such as brisk walking or carrying light loads for at least 10 minutes continuously?: Does your/SP's work involve moderate-intensity activity that causes small increases in breathing or heart rate such as brisk walking or carrying light loads for at least 10 minutes continuously?
+PAQ625 - In a typical week, on how many days do you/does SP do moderate-intensity activities as part of your/his/her work?: In a typical week, on how many days do you/does SP do moderate-intensity activities as part of your/his/her work?
+PAD630 - How much time do you/does SP spend doing moderate-intensity activities at work on a typical day?: How much time do you/does SP spend doing moderate-intensity activities at work on a typical day?
+PAQ635 - In a typical week do you/does SP walk or use a bicycle for at least 10 minutes continuously to get to and from places?: In a typical week do you/does SP walk or use a bicycle for at least 10 minutes continuously to get to and from places?
+PAQ640 - In a typical week, on how many days do you/does SP walk or bicycle for at least 10 minutes continuously to get to and from places?: In a typical week, on how many days do you/does SP walk or bicycle for at least 10 minutes continuously to get to and from places?
+PAD645 - How much time do you/does SP spend walking or bicycling for travel on a typical day?: How much time do you/does SP spend walking or bicycling for travel on a typical day?
+PAQ650 - In a typical week do you/does SP do any vigorous-intensity sports, fitness, or recreational activities that cause large increases in breathing or heart rate like running or basketball for at least 10 minutes continuously?: In a typical week do you/does SP do any vigorous-intensity sports, fitness, or recreational activities that cause large increases in breathing or heart rate like running or basketball for at least 10 minutes continuously?
+PAQ655 - In a typical week, on how many days do you/does SP do vigorous-intensity sports, fitness or recreational activities?: In a typical week, on how many days do you/does SP do vigorous-intensity sports, fitness or recreational activities?
+PAD660 - How much time do you/does SP spend doing vigorous-intensity sports, fitness or recreational activities on a typical day?: How much time do you/does SP spend doing vigorous-intensity sports, fitness or recreational activities on a typical day?
+PAQ665 - In a typical week do you/does SP do any moderate-intensity sports, fitness, or recreational activities that cause a small increase in breathing or heart rate such as brisk walking, bicycling, swimming, or volleyball for at least 10 minutes continuously?: In a typical week do you/does SP do any moderate-intensity sports, fitness, or recreational activities that cause a small increase in breathing or heart rate such as brisk walking, bicycling, swimming, or volleyball for at least 10 minutes continuously?
+PAQ670 - In a typical week, on how many days do you/does SP do moderate-intensity sports, fitness or recreational activities?: In a typical week, on how many days do you/does SP do moderate-intensity sports, fitness or recreational activities?
+PAD675 - How much time do you/does SP spend doing moderate-intensity sports, fitness or recreational activities on a typical day?: How much time do you/does SP spend doing moderate-intensity sports, fitness or recreational activities on a typical day?
+PAD680 - How much time do you/does SP usually spend sitting on a typical day?: How much time do you/does SP usually spend sitting on a typical day?
+DBQ010 - Ever breastfed or fed breastmilk: Was {SP} ever breastfed or fed breastmilk?
+DBD030 - Age stopped breastfeeding(days): How old was {SP} when {he/she} completely stopped breastfeeding or being fed breastmilk? (Days)
+DBD041 - Age first fed formula(days): How old was {SP} when {he/she} was first fed formula? (Days)
+DBD050 - Age stopped receiving formula(days): How old was {SP} when {he/she} completely stopped drinking formula? (Days)
+DBD055 - Age started other food/beverage: How old was {SP} when {he/she} was first fed anything other than breast milk or formula? (Days)
+DBD061 - Age first fed milk(days): How old was {SP} when {he/she} was first fed milk? (Days)
+DBQ073A - Type of milk first fed - whole milk: What type of milk was {SP} first fed on a daily basis? Was it . . . (Whole or regular milk)
+DBQ073B - Type of milk first fed - 2% milk: What type of milk was {SP} first fed on a daily basis? Was it . . . (2% fat or reduced-fat milk)
+DBQ073C - Type of milk first fed - 1% milk: What type of milk was {SP} first fed on a daily basis? Was it . . . (1% fat or low-fat milk (includes 0.5% fat milk or "low-fat milk" not further specified))
+DBQ073D - Type of milk first fed - fat free milk: What type of milk was {SP} first fed on a daily basis? Was it . . . (Fat-free, skim or nonfat milk)
+DBQ073E - Type of milk first fed - soy milk: What type of milk was {SP} first fed on a daily basis? Was it . . . (Soy milk)
+DBQ073U - Type of milk first fed - other: What type of milk was {SP} first fed on a daily basis? Was it . . . (Another type)
+DBQ700 - How healthy is the diet: In general, how healthy is {your/his/her} overall diet? Would you say . . .
+DBQ197 - Past 30 day milk product consumption: In the past 30 days, how often did {you/SP} have milk to drink or on {your/his/her} cereal? Please include chocolate and other flavored milks as well as hot cocoa made with milk. Do not count small amounts of milk added to coffee or tea. Would you say...
+DBQ223A - You drink whole or regular milk: What type of milk was it? Was it usually . . . (Whole or regular)
+DBQ223B - You drink 2% fat milk: What type of milk was it? Was it usually . . . (2% fat or reduced-fat milk)
+DBQ223C - You drink 1% fat milk: What type of milk was it? Was it usually . . . (1% fat or low-fat milk (includes 0.5% fat milk or "low-fat milk" not further specified))
+DBQ223D - You drink fat free/skim milk: What type of milk was it? Was it usually . . . (Fat-free, skim or nonfat milk)
+DBQ223E - You drink soy milk: What type of milk was it? Was it usually . . . (Soy milk)
+DBQ223U - You drink another type of milk: What type of milk was it? Was it usually . . . (Another type)
+DBQ229 - Regular milk use 5 times per week: A regular milk drinker is someone who uses any type of milk at least 5 times a week. Using this definition, which statement best describes {you/SP}?...
+DBQ235A - How often drank milk age 5-12: How often did {you/SP} drink any type of milk, including milk added to cereal when {you were/s/he was} a child between the ages of 5 and 12 years old? Would you say...
+DBQ235B - How often drank milk age 13-17: How often did {you/SP} drink any type of milk, including milk added to cereal when {you were/s/he was} a teenager between the ages of 13 and 17 years old? Would you say...
+DBQ235C - How often drank milk age 18-35: How often did {you/SP} drink any type of milk, including milk added to cereal when {you were/s/he was} a young adult between the ages of 18 and 35 years old? Would you say...
+DBQ301 - Community/Government meals delivered: In the past 12 months, did {you/SP} receive any meals delivered to {your/his/her} home from community programs, "Meals on Wheels", or any other programs?
+DBQ330 - Eat meals at Community/Senior center: In the past 12 months, did {you/SP} go to a community program or senior center to eat prepared meals?
+DBQ360 - Attend kindergarten thru high school: During the school year, {do you/does SP} attend a kindergarten, grade school, junior or high school?
+DBQ370 - School serves school lunches: Does {your/SP's} school serve school lunches? These are complete lunches that cost the same every day.
+DBD381 - # of times/week get school lunch: During the school year, about how many times a week {do you/does SP} usually get a complete school lunch?
+DBQ390 - School lunch free, reduced or full price: {Do you/Does SP} get these lunches free, at a reduced price, or {do you/does he/she} pay full price?
+DBQ400 - School serve complete breakfast each day: Does {your/SP's} school serve a complete breakfast that costs the same every day?
+DBD411 - # of times/week get school breakfast: During the school year, about how many times a week {do you/does SP} usually get a complete breakfast at school?
+DBQ421 - School breakfast free/reduced/full price: {Do you/Does SP} get these breakfasts free, at a reduced price, or {do you/does he/she} pay full price?
+DBQ424 - Summer program meal free/reduced price: (Do you/Does SP) get a free or reduced price meal at any summer program (he/she) attends?
+DBD895 - # of meals not home prepared: During the past 7 days, how many meals {did you/did SP} get that were prepared away from home in places such as restaurants, fast food places, food stands, grocery stores, or from vending machines? {Please do not include meals provided as part of the school lunch or school breakfast./Please do not include meals provided as part of the community programs you reported earlier.}
+DBD900 - # of meals from fast food or pizza place: How many of those meals {did you/did SP} get from a fast-food or pizza place?
+DBD905 - # of ready-to-eat foods in past 30 days: During the past 30 days, how often did {you/SP} eat "ready to eat" foods from the grocery store? Please do not include sliced meat or cheese you buy for sandwiches and frozen or canned foods.
+DBD910 - # of frozen meals/pizza in past 30 days: During the past 30 days, how often did you {SP} eat frozen meals or frozen pizzas? Here are some examples of frozen meals and frozen pizzas.
+CBQ596 - Heard of My Plate: {Have you/Has SP} heard of My Plate?
+CBQ606 - Looked up My Plate on internet: {Have you/Has SP} looked up the My Plate plan on the internet?
+CBQ611 - Tried My Plate plan: {Have you/Has SP} tried to follow the recommendations in the My Plate plan?
+DBQ930 - Main meal planner/preparer: {Are you/Is SP} the person who does most of the planning or preparing of meals in {your/SP's} family?
+DBQ935 - Shared meal planning/preparing duty: {Do you/Does SP} share in the planning or preparing of meals with someone else?
+DBQ940 - Main food shopper: {Are you/Is SP} the person who does most of the shopping for food in {your/SP's} family?
+DBQ945 - Shared food shopping duty: {Do you/Does SP} share in the shopping for food with someone else?
+SMQ020 - Smoked at least 100 cigarettes in life: These next questions are about cigarette smoking and other tobacco use. {Have you/Has SP} smoked at least 100 cigarettes in {your/his/her} entire life?
+SMD030 - Age started smoking cigarettes regularly: How old {were you/was SP} when {you/s/he} first started to smoke cigarettes fairly regularly?
+SMQ040 - Do you now smoke cigarettes?: {Do you/Does SP} now smoke cigarettes?
+SMQ050Q - How long since quit smoking cigarettes: How long has it been since {you/SP} quit smoking cigarettes?
+SMQ050U - Unit of measure (day/week/month/year): UNIT OF MEASURE
+SMD057 - # cigarettes smoked per day when quit: At that time, about how many cigarettes did {you/SP} usually smoke per day?
+SMQ078 - How soon after waking do you smoke: How soon after you wake up do you smoke? Would you say . . .
+SMD641 - # days smoked cigs during past 30 days: On how many of the past 30 days did {you/SP} smoke a cigarette?
+SMD650 - Avg # cigarettes/day during past 30 days: During the past 30 days, on the days that {you/SP} smoked, about how many cigarettes did {you/s/he} smoke per day?
+SMD093 - Cigarette Product UPC Code: Cigarette Product UPC Code.
+SMDUPCA - Cigarette Product UPC Code: Cigarette Product UPC Code.
+SMD100BR - Cigarette Brand/sub-brand: Cigarette Brand/sub-brand.
+SMD100FL - Cigarette Filter type: Do you usually smoke filtered or non-filtered cigarettes?
+SMD100MN - Cigarette Menthol indicator: Do you usually smoke menthol or non-menthol cigarettes?
+SMD100LN - Cigarette Length: Cigarette Length.
+SMD100TR - Cigarette FTC Tar Content: Cigarette FTC Tar Content.
+SMD100NI - Cigarette FTC Nicotine Content: Cigarette FTC Nicotine Content.
+SMD100CO - Cigarette FTC Carbon Monoxide Content: Cigarette FTC Carbon Monoxide Content.
+SMQ621 - Cigarettes smoked in entire life: The following questions are about cigarette smoking and other tobacco use. Do not include cigars or marijuana. About how many cigarettes have you smoked in your entire life?
+SMD630 - Age first smoked whole cigarette: How old were you when you smoked a whole cigarette for the first time?
+SMQ661 - Brand of cigs smoked past 30 days: During the past 30 days, what brand of cigarettes {did you/did SP} usually smoke?
+SMQ665A - Regular cigarette product: During the past 30 days, what brand of cigarettes {did you/did SP} usually smoke? (Marlboro)
+SMQ665B - Regular cigarette product: During the past 30 days, what brand of cigarettes {did you/did SP} usually smoke? (Winston)
+SMQ665C - Regular cigarette product: During the past 30 days, what brand of cigarettes {did you/did SP} usually smoke? (Camel)
+SMQ665D - Regular cigarette product: During the past 30 days, what brand of cigarettes {did you/did SP} usually smoke? (Other)
+SMQ670 - Tried to quit smoking: During the past 12 months, {have you/has SP} stopped smoking for longer than a day because {you were/he was/she was} trying to quit smoking?
+SMQ848 - Number of days used chewing tobacco -past 5 days: During the past 5 days, on how many days did {you/SP} use chewing tobacco or snuff?
+SMQ852Q - Number of days smoked cigars - past 5 days: During the past 5 days, on how many days did {you/SP} smoke cigars?
+SMQ852U - Unit of measure (day/week/month/year): Unit of measure for number of days smoked cigars.
+SMQ890 - Smoked pipe at least 20 times in life: {Have you/Has SP} smoked a pipe at least 20 times in {your/his/her} entire life?
+SMQ895 - Number of days smoked pipe - past 5 days: During the past 5 days, on how many days did {you/SP} smoke a pipe?
+SMQ900 - Used smokeless tobacco 20 times in life: {Have you/Has SP} used smokeless tobacco at least 20 times in {your/his/her} entire life?
+SMQ905 - # of days used smokeless tobacco last 5 days: During the past 5 days, on how many days did {you/SP} use smokeless tobacco?
+SMQ910 - Smoked cigars at least 20 times in life: {Have you/Has SP} smoked cigars at least 20 times in {your/his/her} entire life?
+SMQ915 - # of days smoked cigars last 5 days: During the past 5 days, on how many days did {you/SP} smoke cigars?
+SMAQUEX2 - Questionnaire Mode Flag: Questionnaire Mode Flag.
+ALQ111 - Had at least 12 alcohol drinks/lifetime: The questions on alcohol use were asked using the Computer-Assisted Personal Interviewing (CAPI) system. These next questions are about drinking alcoholic beverages. Included are liquor (such as whiskey or gin), beer, wine, wine coolers, and any other type of alcoholic beverage. In {your/SP's} entire life, {have you/has he/has she} had at least 1 drink of any kind of alcohol, not counting small tastes or sips? By "alcohol" we mean your use of beer, wine, or liquor. (1=Yes, 2=No)
+ALQ121 - Past 12 mo how often have alcohol drink: During the past 12 months, how often did {you/SP} drink any type of alcoholic beverage? PROBE: How many days per week, per month, or per year did {you/SP} drink?
+ALQ130 - Avg # alcoholic drinks/day - past 12 mos: During the past 12 months, on average, how many alcoholic drinks did {you/SP} have on those days?
+ALQ142 - #days have 4/5 or more drinks/past 12 mo: During the past 12 months, on how many days did {you/SP} have {4/5 or more} drinks of any alcoholic beverage? PROBE: How many days per week, per month, or per year did {you/SP} have {4/5 or more} drinks in a single day?
+ALQ270 - # times 4-5+ drinks in 2 hrs/past 12 mos: During the past 12 months, about how many times did {you/SP} drink {4/5} or more alcoholic drinks in a 2 hour period?
+ALQ280 - # days have 4/5+ drinks/last yr: During the last 12 months, how many days of the year did {you/SP} have {4/5 or more} drinks of any alcoholic beverage? INTERVIEWER: If respondent can't remember, ask for best estimate.
+ALQ290 - # days 12+ drinks of alcohol/year: During the last 12 months, how many days of the year did {you/SP} have 12 or more drinks of any alcoholic beverage? INTERVIEWER: If respondent can't remember, ask for best estimate.
+ALQ151 - Ever had 4/5 or more drinks every day?: Was there ever a time or times in {your/SP's} life when {you/s/he} drank {4/5} or more drinks of any kind of alcoholic beverage almost every day?
+ALQ170 - # days over last year had 4/5+ drinks: During the last 12 months, how many days did {you/SP} have {4/5} or more drinks on the same occasion? By 'occasion,' we mean at the same time or within a couple of hours of each other.
