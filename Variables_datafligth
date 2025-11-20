@@ -1,0 +1,39 @@
+Variables to keep:
+
+Temporal information:
+
+YEAR, QUARTER, MONTH, DAY_OF_MONTH, DAY_OF_WEEK, FL_DATE
+
+Carrier and flight identifiers:
+
+OP_UNIQUE_CARRIER, OP_CARRIER, OP_CARRIER_AIRLINE_ID, OP_CARRIER_FL_NUM, TAIL_NUM
+
+Airport/location details:
+
+ORIGIN, ORIGIN_CITY_NAME, ORIGIN_STATE_ABR
+
+DEST, DEST_CITY_NAME, DEST_STATE_ABR
+
+Scheduled and actual times:
+
+CRS_DEP_TIME, DEP_TIME
+
+WHEELS_OFF, WHEELS_ON
+
+ARR_TIME
+
+Delay and cancellation:
+
+DEP_DELAY, DEP_DELAY_NEW, DEP_DEL15
+
+ARR_DELAY, ARR_DELAY_NEW
+
+CANCELLED, CANCELLATION_CODE
+
+Flight time and distance:
+
+ACTUAL_ELAPSED_TIME, AIR_TIME, DISTANCE
+
+Delay causes (nalyzing causes):
+
+CARRIER_DELAY, WEATHER_DELAY
