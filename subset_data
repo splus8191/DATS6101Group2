@@ -1,0 +1,89 @@
+#Author : Jael Rojas
+## code ##
+
+---
+title: "Project 2: Data Flight analysis"
+author: "Jael Rojas"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+  code_folding: hide
+number_sections: false
+toc: yes
+toc_depth: 3
+toc_float: yes
+pdf_document:
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(caret)
+library(car)
+
+# Can globally set option for number display format.
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+```
+
+#Opening the file
+```{r}
+# getwd()
+airline_data <- read.csv("C:/Users/Jael Rojas/Documents/MS_DataScience/DataScience/Github_class2/FA25-DATS6101-main/HW/project2/T_ONTIME_REPORTING.csv", header = TRUE)
+str(airline_data)
+head(airline_data)
+library(ezids)
+summary(airline_data)
+```
+
+```{r}
+
+# Load full data
+# Select relevant columns
+selected_columns <- c("YEAR", "MONTH", "DAY_OF_MONTH", "DAY_OF_WEEK",
+                      "OP_UNIQUE_CARRIER", "OP_CARRIER", "OP_CARRIER_AIRLINE_ID",
+                      "TAIL_NUM", "OP_CARRIER_FL_NUM",
+                      "ORIGIN", "ORIGIN_CITY_NAME", "ORIGIN_STATE_ABR",
+                      "DEST", "DEST_CITY_NAME", "DEST_STATE_ABR",
+                      "CRS_DEP_TIME", "DEP_TIME", "DEP_DELAY", "DEP_DEL15",
+                      "ARR_TIME", "ARR_DELAY", "ARR_DEL15", "CANCELLED",
+                      "CANCELLATION_CODE",
+                      "ACTUAL_ELAPSED_TIME", "AIR_TIME", "DISTANCE",
+                      "CARRIER_DELAY", "WEATHER_DELAY")
+# Subset data
+
+valid_columns <- selected_columns[selected_columns %in% colnames(airline_data)]
+airline_subset <- airline_data[, valid_columns]
+# Filter rows with non-missing DEP_DELAY and ARR_DELAY and CANCELLED==0 (flights not cancelled)
+airline_filtered <- subset(airline_subset, !is.na(DEP_DELAY) & !is.na(ARR_DELAY) & CANCELLED == 0)
+
+set.seed(123)
+
+# Randomly sample 6000 rows
+airline_sample_random <- airline_filtered[sample(nrow(airline_filtered), 6000), ]
+
+# Save to CSV
+write.csv(airline_sample_random, file = "airline_subset_6000_random.csv", row.names = FALSE)
+```
+
+```{r}
+airline_dataf <- read.csv("C:/Users/Jael Rojas/Documents/MS_DataScience/DataScience/Github_class2/FA25-DATS6101-main/HW/project2/airline_subset_6000_random.csv", header = TRUE)
+str(airline_dataf)
+head(airline_dataf)
+summary(airline_data)
+```
+
+```{r}
+# Select necessary variables
+selected_vars <- c("YEAR", "MONTH", "DAY_OF_MONTH", "DAY_OF_WEEK",
+                   "CRS_DEP_TIME", "OP_UNIQUE_CARRIER", "OP_CARRIER",
+                   "DISTANCE", "AIR_TIME", "OP_CARRIER_FL_NUM",
+                   "DEP_DEL15", "CARRIER_DELAY", "WEATHER_DELAY",
+                   "CANCELLED")
+
+# Subset dataset
+flight_data_subset <- airline_data[, selected_vars]
+
