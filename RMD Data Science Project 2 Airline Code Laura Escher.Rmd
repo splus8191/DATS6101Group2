@@ -141,6 +141,18 @@ data_jan$DAY_OF_WEEK <- as.factor(data_jan$DAY_OF_WEEK)
 tab <- table(data_jan$airline, data_jan$DEP_DEL15)
 chisq.test(tab)
 
+This means there is a very strong statistical association between the airline and the delay status (DEP_DEL15). the likelihood that delay rates are independent of the airline is effectively zero given this p-value.
+
+The null hypothesis (H0) states that the delay status (on-time vs delayed) is independent of the airline.
+The p-value id indicate there is no significance forr that reason we reject the null hypothesis.
+
+We can infer that the delay frequency depends o the airline.
+Airlines differ statistically in their proportions of flights delayed by 15 minutes or more.
+
+The test confirms that the asociation between airline and delay status is highly significant and no due to random chance.
+
+
+
 chisq.test(data_jan$airline, data_jan$carrier_delay_ind)
 chisq.test(data_jan$airline, data_jan$weather_delay_ind)
 chisq.test(data_jan$airline, data_jan$nas_delay_ind)
@@ -180,4 +192,5 @@ data_jan %>%
     y = "Count"
   ) +
   theme_bw()
+
 ```
