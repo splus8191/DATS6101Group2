@@ -46,10 +46,10 @@ We first opened up the file and examined the data using the str() function. We c
 
 Variable  |  Definition
 
-- YEAR | Year
-- MONTH | Month (MM)
-- DAY_OF_MONTH | Day of the month
-- DAY_OF_WEEK | Day of the week
+- YEAR | Year 2025
+- MONTH | Month (MM) January
+- DAY_OF_MONTH | Day of the month 1-31
+- DAY_OF_WEEK | Day of the week 1(Monday) -7(Sunday).
 - OP_UNIQUE_CARRIER | Unique Carrier Code. When the same code has been used by multiple carriers, a numeric suffix is used for earlier users, for example, PA, PA(1), PA(2). Use this field for analysis across a range of years.
 - ORIGIN | Origin airport
 - ORIGIN_CITY_NAME | Origin Airport, City Name
@@ -506,4 +506,5 @@ ggplot(majorairline, aes(x = WEATHER_DELAY, y = delay_minutes)) +
     axis.title = element_text(size = 12, face = "bold"),
     axis.text = element_text(color = "black", size = 11),
     plot.caption = element_text(hjust = 0, size = 11, face = "italic")
+
   )
