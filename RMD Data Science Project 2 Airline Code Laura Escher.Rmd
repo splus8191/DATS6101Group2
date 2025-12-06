@@ -101,13 +101,16 @@ airdata1 <- airdata %>%
 # airdata %>%
 #   count(OP_UNIQUE_CARRIER)
 
-ggplot(data = airdata1, aes(x = airline)) +
-  geom_bar(fill = 'blue') +
-  labs(title = "Number of Airlines",
-       x = "Airlines",
-       y = "Number of Flights by Airline") +
+ggplot(data = airdata1, aes(x = reorder(airline, airline, FUN = length))) +
+  geom_bar(fill = "blue") +
+  labs(
+    title = "Number of Airlines",
+    x = "Airlines",
+    y = "Number of Flights by Airline"
+  ) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 0.5))
+
 ```
 
 There are 14 airlines total that flew in January 2025.
@@ -508,3 +511,4 @@ ggplot(majorairline, aes(x = WEATHER_DELAY, y = delay_minutes)) +
     plot.caption = element_text(hjust = 0, size = 11, face = "italic")
 
   )
+
