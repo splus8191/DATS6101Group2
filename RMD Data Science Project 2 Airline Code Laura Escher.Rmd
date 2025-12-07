@@ -135,6 +135,7 @@ sum(is.na(majorairline))
 colSums(is.na(majorairline))
 ```
 Before moving forward, once again, the five types of delays all have the same number of NAs at 317,538 each. Are there any such cases where there are zeros across the five types? Maybe the Bureau of Transportation Statistics should have put zeros where they were needed.
+Justification: The number of rows (fivedelays_zero) will tell us how many flights were truly on time with no delay at all (neither 15 minutes as the convention).
 ```{r}
 fivedelays_zero <- majorairline %>%
    filter(WEATHER_DELAY == 0,
@@ -511,4 +512,5 @@ ggplot(majorairline, aes(x = WEATHER_DELAY, y = delay_minutes)) +
     plot.caption = element_text(hjust = 0, size = 11, face = "italic")
 
   )
+
 
