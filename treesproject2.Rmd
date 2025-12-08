@@ -1,0 +1,143 @@
+---
+title: "FlightData"
+output: html_document
+date: "2025-12-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r}
+flightdata = read.csv("C:/Users/Adam/Downloads/LAirlinedata.csv")
+```
+
+```{r}
+num_cols <- names(flightdata)[sapply(flightdata, is.numeric)]
+cors <- cor(flightdata[num_cols], use = "pairwise.complete.obs")
+isDelayed_corrs <- cors[,"isDelayed"]
+```
+
+```{r}
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+flightdata <- subset(flightdata, select = -DEST_STATE_ABR)
+```
+
+```{r}
+library(tree)
+cors <- cor(flightdata[sapply(flightdata, is.numeric)], use = "complete.obs")
+tree_model <- tree(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME,
+                   data = flightdata,
+                   mindev = 0.001, mincut = 1, minsize = 2)
+summary(tree_model)
+```
+
+```{r}
+length(unique(flightdata$MONTH))
+#all months are jan, lol, this decreases model efficency
+```
+
+```{r}
+library(randomForest)
+
+flightdata <- flightdata %>%
+  mutate(region = case_when(
+    
+    # 1. Northeast – now includes the last stragglers
+    ORIGIN %in% c("JFK","LGA","EWR","BOS","PHL","DCA","IAD","BWI","PIT","CLE","BUF","ALB","SYR","ROC",
+                  "BDL","PVD","PWM","AVP","MDT","HPN","ISP","SWF","ACY","ABE","MHT","ORH","BTV","BGR",
+                  "PQI","PBG","PSM","TTN","SCE","LBE","HGR","JST","ELM","IAG","MGW") ~ "Northeast",
+    
+    # 2. Midwest – added APN, BJI, BRD, DEC, DLH, EAU, HIB, INL, MCW, RHI
+    ORIGIN %in% c("ORD","MDW","DTW","MSP","STL","MKE","IND","CMH","CVG","GRR","FSD","CID","DSM","OMA",
+                  "SDF","MCI","MSN","ATW","GRB","LAN","TOL","SBN","PIA","MLI","BMI","SPI","CMI","EVV",
+                  "DAY","FWA","CAK","SGF","LCK","AZO","MBS","FNT","TVC","PLN","ESC","CMX","CIU","IMT",
+                  "RST","LSE","BLV","RFD","SCK","GRI","BIS","FAR","MOT","DIK","GFK","JMS","ABR","LNK",
+                  "DVL","MQT","APN","BJI","BRD","DEC","DLH","EAU","HIB","INL","MCW","RHI") ~ "Midwest",
+    
+    # 3. Southeast – unchanged (already complete)
+    ORIGIN %in% c("ATL","CLT","MCO","MIA","FLL","TPA","JAX","RSW","PBI","SRQ","EYW","SFB","PIE","PGD",
+                  "VPS","ECP","PNS","TLH","GNV","DAB","MLB","RDU","CHS","CAE","GSP","SAV","MYR","ILM",
+                  "AVL","TRI","TYS","GSO","FAY","OAJ","BNA","MEM","BHM","HSV","MSY","JAN","LIT","SHV",
+                  "MOB","GPT","RIC","ORF","ROA","CRW","HTS","CKB","CHO","LEX","AGS","ABY","CHA","MEI",
+                  "MGM","HHH","USA") ~ "Southeast",
+    
+    # 4. South Central – added DDC, HYS, LBL, SLN, SWO
+    ORIGIN %in% c("DFW","DAL","IAH","HOU","AUS","SAT","OKC","TUL","AMA","LBB","MAF","ELP","ABQ",
+                  "MFE","HRL","BRO","CRP","LRD","ACT","CLL","GRK","SJT","ABI","FSM","XNA","BTR","LFT",
+                  "MLU","AEX","LCH","ICT","GCK","SPS","LAW","GGG","TYR","TXK","JLN","SUX","MHK","COU",
+                  "DDC","HYS","LBL","SLN","SWO","BPT") ~ "South_Central",
+    
+    # 5. West – unchanged (already had everything else)
+    ORIGIN %in% c("LAX","SFO","SJC","OAK","SAN","SNA","ONT","BUR","LGB","SMF","FAT","RNO","LAS","PHX",
+                  "DEN","SLC","SEA","PDX","BOI","GEG","EUG","RDM","MFR","PSC","PAE","BLI","SBP","SBA",
+                  "PSP","MRY","BFL","STS","ACV","RDD","CEC","SMX","COS","EGE","HDN","GUC","MTJ","JAC",
+                  "BZN","MSO","FCA","BIL","GTF","HLN","RAP","PVU","IDA","PIH","SUN","TWF","LWS","PUW",
+                  "EAT","YKM","ALW","TUS","FLG","GCN","AZA","DRO","GJT","PUB","ASE","CDC","CPR","CYS",
+                  "LAR","LBF","RIW","RKS","ROW","SAF","SGU","SHR","VCT","YUM","XWA","EKO","BIH","BFF",
+                  "EAR","GCC","FOD","HOB","PRC","PIB","OTH","BTM","STC","COD") ~ "West",
+    
+    # 6. Alaska + Hawaii + Territories
+    ORIGIN %in% c("ANC","FAI","JNU","KTN","SIT","ADK","BET","OTZ","OME","BRW","CDV","YAK","PSG",
+                  "SCC","WRG","ADQ","HNL","OGG","KOA","LIH","ITO","MKK","LNY","JHM","SJU","BQN",
+                  "PSE","STT","STX","GUM","SPN","PPG") ~ "Alaska_Hawaii_Territories",
+    
+    TRUE ~ "ERROR"
+  ))
+```
+
+```{r}
+flightdata$region <- factor(flightdata$region)
+flightdata %>%
+  group_by(region) %>%
+  summarise(mean_delay = mean(ARR_DELAY + DEP_DELAY, na.rm = TRUE))
+```
+  
+```{r}  
+library(randomForest)
+# Make sure isDelayed is a factor (classification)
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+
+# Fit the random forest
+rf_model <- randomForest(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME + region,
+                         data = flightdata,
+                         ntree = 250,       # number of trees
+                         mtry = 2,          # number of variables tried at each split
+                         importance = TRUE) # compute variable importance
+
+# View the model summary
+print(rf_model)
+```
+
+```{r} 
+
+table(flightdata$region)
+
+missing = flightdata %>%
+  filter(region == "ERROR") %>%
+  select(ORIGIN)
+
+unique(missing)
+```
+
+```{r}
+table(flightdata$region, flightdata$isDelayed) %>%
+  chisq.test()
+
+library(randomForest)
+# Make sure isDelayed is a factor (classification)
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+
+# Fit the random forest
+rf_model <- randomForest(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME,
+                         data = flightdata,
+                         ntree = 250,       # number of trees
+                         mtry = 2,          # number of variables tried at each split
+                         importance = TRUE) # compute variable importance
+
+# View the model summary
+print(rf_model)
+```
