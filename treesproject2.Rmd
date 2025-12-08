@@ -42,65 +42,52 @@ length(unique(flightdata$MONTH))
 
 ```{r}
 library(randomForest)
+library(dplyr)
 
 flightdata <- flightdata %>%
   mutate(region = case_when(
+    ORIGIN_STATE_ABR %in% c("CT","DC","DE","MA","MD","ME","NH","NJ","NY","PA","RI","VT") ~ "Northeast",
     
-    # 1. Northeast
-    ORIGIN %in% c("JFK","LGA","EWR","BOS","PHL","DCA","IAD","BWI","PIT","CLE","BUF","ALB","SYR","ROC",
-                  "BDL","PVD","PWM","AVP","MDT","HPN","ISP","SWF","ACY","ABE","MHT","ORH","BTV","BGR",
-                  "PQI","PBG","PSM","TTN","SCE","LBE","HGR","JST","ELM","IAG","MGW") ~ "Northeast",
+    ORIGIN_STATE_ABR %in% c("IA","IL","IN","MI","MN","MO","ND","NE","OH","SD","WI") ~ "Midwest",
     
-    # 2. Midwest
-    ORIGIN %in% c("ORD","MDW","DTW","MSP","STL","MKE","IND","CMH","CVG","GRR","FSD","CID","DSM","OMA",
-                  "SDF","MCI","MSN","ATW","GRB","LAN","TOL","SBN","PIA","MLI","BMI","SPI","CMI","EVV",
-                  "DAY","FWA","CAK","SGF","LCK","AZO","MBS","FNT","TVC","PLN","ESC","CMX","CIU","IMT",
-                  "RST","LSE","BLV","RFD","SCK","GRI","BIS","FAR","MOT","DIK","GFK","JMS","ABR","LNK",
-                  "DVL","MQT","APN","BJI","BRD","DEC","DLH","EAU","HIB","INL","MCW","RHI") ~ "Midwest",
+    ORIGIN_STATE_ABR %in% c("AL","FL","GA","KY","MS","NC","SC","TN","VA","WV") ~ "Southeast",
     
-    # 3. Southeast
-    ORIGIN %in% c("ATL","CLT","MCO","MIA","FLL","TPA","JAX","RSW","PBI","SRQ","EYW","SFB","PIE","PGD",
-                  "VPS","ECP","PNS","TLH","GNV","DAB","MLB","RDU","CHS","CAE","GSP","SAV","MYR","ILM",
-                  "AVL","TRI","TYS","GSO","FAY","OAJ","BNA","MEM","BHM","HSV","MSY","JAN","LIT","SHV",
-                  "MOB","GPT","RIC","ORF","ROA","CRW","HTS","CKB","CHO","LEX","AGS","ABY","CHA","MEI",
-                  "MGM","HHH","USA") ~ "Southeast",
+    ORIGIN_STATE_ABR %in% c("AR","KS","LA","NM","OK","TX") ~ "South_Central",
     
-    # 4. South Central
-    ORIGIN %in% c("DFW","DAL","IAH","HOU","AUS","SAT","OKC","TUL","AMA","LBB","MAF","ELP","ABQ",
-                  "MFE","HRL","BRO","CRP","LRD","ACT","CLL","GRK","SJT","ABI","FSM","XNA","BTR","LFT",
-                  "MLU","AEX","LCH","ICT","GCK","SPS","LAW","GGG","TYR","TXK","JLN","SUX","MHK","COU",
-                  "DDC","HYS","LBL","SLN","SWO","BPT") ~ "South_Central",
+    ORIGIN_STATE_ABR %in% c("AZ","CA","CO","ID","MT","NV","OR","UT","WA","WY") ~ "West",
     
-    # 5. West
-    ORIGIN %in% c("LAX","SFO","SJC","OAK","SAN","SNA","ONT","BUR","LGB","SMF","FAT","RNO","LAS","PHX",
-                  "DEN","SLC","SEA","PDX","BOI","GEG","EUG","RDM","MFR","PSC","PAE","BLI","SBP","SBA",
-                  "PSP","MRY","BFL","STS","ACV","RDD","CEC","SMX","COS","EGE","HDN","GUC","MTJ","JAC",
-                  "BZN","MSO","FCA","BIL","GTF","HLN","RAP","PVU","IDA","PIH","SUN","TWF","LWS","PUW",
-                  "EAT","YKM","ALW","TUS","FLG","GCN","AZA","DRO","GJT","PUB","ASE","CDC","CPR","CYS",
-                  "LAR","LBF","RIW","RKS","ROW","SAF","SGU","SHR","VCT","YUM","XWA","EKO","BIH","BFF",
-                  "EAR","GCC","FOD","HOB","PRC","PIB","OTH","BTM","STC","COD") ~ "West",
+    ORIGIN_STATE_ABR %in% c("AK","HI","PR","VI","GU","AS","MP","TT") ~ "Alaska_Hawaii_Territories",
     
-    # 6. Alaska + Hawaii + Territories
-    ORIGIN %in% c("ANC","FAI","JNU","KTN","SIT","ADK","BET","OTZ","OME","BRW","CDV","YAK","PSG",
-                  "SCC","WRG","ADQ","HNL","OGG","KOA","LIH","ITO","MKK","LNY","JHM","SJU","BQN",
-                  "PSE","STT","STX","GUM","SPN","PPG") ~ "Alaska_Hawaii_Territories",
-    
-    TRUE ~ "ERROR"
-  ))
+    TRUE ~ "Other"
+  )) %>%
+  mutate(region = factor(region))
 ```
 
 ```{r}
 flightdata$region <- factor(flightdata$region)
-flightdata %>%
+delaytime = flightdata %>%
   group_by(region) %>%
   summarise(mean_delay = mean(ARR_DELAY + DEP_DELAY, na.rm = TRUE))
 ```
   
+  
+```{r}  
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+flightdata$ORIGIN <- factor(flightdata$ORIGIN)
+flightdata$DEST <- factor(flightdata$DEST)
+flightdata$ORIGIN_STATE_ABR <- factor(flightdata$ORIGIN_STATE_ABR)
+flightdata$DEST_STATE_ABR <- factor(flightdata$DEST_STATE_ABR)
+flightdata$region <- factor(flightdata$region)
+flightdata$OP_CARRIER_AIRLINE_ID <- factor(flightdata$OP_CARRIER_AIRLINE_ID)
+flightdata$CARRIER  <- as.factor(flightdata$OP_UNIQUE_CARRIER)
+flightdata$DEP_HOUR <- as.factor(floor(flightdata$CRS_DEP_TIME / 100))
+```
+
 ```{r}  
 library(randomForest)
 flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
 
-rf_model <- randomForest(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME + region,
+rf_model <- randomForest(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME + region + ORIGIN_STATE_ABR + DEST_STATE_ABR + flightdata$DEP_HOUR,
                          data = flightdata,
                          ntree = 250,       
                          mtry = 2,          
@@ -110,18 +97,14 @@ print(rf_model)
 ```
 
 
+
+
+
 ```{r}
-table(flightdata$region, flightdata$isDelayed) %>%
-  chisq.test()
 
-library(randomForest)
-flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+library(ggplot2)
 
-rf_model <- randomForest(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME,
-                         data = flightdata,
-                         ntree = 250,     
-                         mtry = 2,          
-                         importance = TRUE) 
+ggplot(flightdata %>% group_by(region) %>% summarise(mean_delay = mean(ARR_DELAY + DEP_DELAY, na.rm = TRUE)),
+       aes(region, mean_delay, fill = region)) + geom_col() + scale_fill_viridis_d()
 
-print(rf_model)
 ```
