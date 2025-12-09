@@ -403,5 +403,18 @@ ggplot(next_month_data,
 ```
 
 
+Conclussion: 
+
+- The model predict moderate risk, with 4 of 10 fligths. 
+- The prediction for the next moth suggest that airlines as Atlanta, Denmark and Delta presents highest probability to arrive late.
+- During the analysis we observe that using only 3 predictor the ROC curve present a fair behavior(flat) with ROC value of 0.5. 
+  This result indicated that the probability of prediction is too low or moderate low, consequently we added more than 20 predictors 
+  and the new ROC increased to 0.7.   
+- An important consideration must be starting from small data and according to the EDA analisys increase tha data size. 
+References: 
+- https://github.com/wwh9345/Regression-Modeling-US-Airline-On-Time-Performance/blob/main/2006-2007_flight_analysis_prediction.ipynb
+- https://www.kaggle.com/code/luiscrmartins/flight-delay-prediction-using-logistic-regression
+
+
 
 
