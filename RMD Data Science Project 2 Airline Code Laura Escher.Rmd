@@ -30,6 +30,8 @@ library(car)
 library(modelsummary)
 library(stats)
 library(knitr)
+library(randomForest)
+library(tree)
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 
 options(scientific=T, digits = 3)
@@ -471,6 +473,139 @@ TukeyHSD(anova1)
 There are significant differences in the average delay minutes across airlines (p < 2e−16).
 Some airlines have much longer delays than others.
 
-# Statistical Modeling
+# Decision Tree [Adam]
 
-## Logistic regression:
+We read the data in.
+```{r}
+flightdata = read.csv("C:/Users/Adam/Downloads/LAirlinedata.csv")
+```
+
+It is important to look at numerical value correlations with the target.This wont capture factor variable correlation but will show us the continuous numerical value correlation. This will give us a picture of what our decision tree will use.
+
+```{r}
+num_cols <- names(flightdata)[sapply(flightdata, is.numeric)]
+cors <- cor(flightdata[num_cols], use = "pairwise.complete.obs")
+isDelayed_corrs <- cors[,"isDelayed"]
+```
+
+convert the target to a factor variable and create the hour variable to help with training.
+
+```{r}
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+flightdata <- subset(flightdata, select = -DEST_STATE_ABR)
+```
+
+```{r}
+cors <- cor(flightdata[sapply(flightdata, is.numeric)], use = "complete.obs")
+tree_model <- tree(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME,
+                   data = flightdata,
+                   mindev = 0.001, mincut = 1, minsize = 2)
+summary(tree_model)
+```
+
+```{r}
+length(unique(flightdata$MONTH))
+```
+
+```{r}
+flightdata <- flightdata %>%
+  mutate(region = case_when(
+    ORIGIN_STATE_ABR %in% c("CT","DC","DE","MA","MD","ME","NH","NJ","NY","PA","RI","VT") ~ "Northeast",
+    
+    ORIGIN_STATE_ABR %in% c("IA","IL","IN","MI","MN","MO","ND","NE","OH","SD","WI") ~ "Midwest",
+    
+    ORIGIN_STATE_ABR %in% c("AL","FL","GA","KY","MS","NC","SC","TN","VA","WV") ~ "Southeast",
+    
+    ORIGIN_STATE_ABR %in% c("AR","KS","LA","NM","OK","TX") ~ "South_Central",
+    
+    ORIGIN_STATE_ABR %in% c("AZ","CA","CO","ID","MT","NV","OR","UT","WA","WY") ~ "West",
+    
+    ORIGIN_STATE_ABR %in% c("AK","HI","PR","VI","GU","AS","MP","TT") ~ "Alaska_Hawaii_Territories",
+    
+    TRUE ~ "Other"
+  )) %>%
+  mutate(region = factor(region))
+```
+
+```{r}
+flightdata$region <- factor(flightdata$region)
+delaytime = flightdata %>%
+  group_by(region) %>%
+  summarise(mean_delay = mean(ARR_DELAY + DEP_DELAY, na.rm = TRUE))
+```
+  
+```{r}  
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+flightdata$ORIGIN <- factor(flightdata$ORIGIN)
+flightdata$DEST <- factor(flightdata$DEST)
+flightdata$ORIGIN_STATE_ABR <- factor(flightdata$ORIGIN_STATE_ABR)
+flightdata$DEST_STATE_ABR <- factor(flightdata$DEST_STATE_ABR)
+flightdata$region <- factor(flightdata$region)
+flightdata$OP_CARRIER_AIRLINE_ID <- factor(flightdata$OP_CARRIER_AIRLINE_ID)
+flightdata$CARRIER  <- as.factor(flightdata$OP_UNIQUE_CARRIER)
+flightdata$DEP_HOUR <- as.factor(floor(flightdata$CRS_DEP_TIME / 100))
+```
+
+This is how we train the singular decision tree. This sadly was not able to capture the factor variables due to the how many levels were in them. Our factor variables such as states had more than the max of 32.ORIGIN_AIRPORT_ID was left in there to display how a non factorized factor variable will just get unused in training. This has moderate accuracy.    
+
+```{r}
+tree_model <- tree(
+  isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME + DEP_HOUR,
+  data = flightdata,
+  mindev = 0.001, mincut = 1, minsize = 4
+)
+
+summary(tree_model)
+```
+
+All months are in January, this decreases model accuracy. 
+```{r}
+length(unique(flightdata$MONTH))
+```
+
+
+```{r}
+flightdata$isDelayed <- factor(flightdata$isDelayed, levels = c(0,1))
+
+rf_model <- randomForest(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + DISTANCE + AIR_TIME + region + ORIGIN_STATE_ABR + DEST_STATE_ABR + flightdata$DEP_HOUR,
+rf_model <- randomForest(isDelayed ~ ORIGIN_AIRPORT_ID + DAY_OF_MONTH + OP_UNIQUE_CARRIER + DISTANCE + AIR_TIME + region + ORIGIN_STATE_ABR + DEST_STATE_ABR + flightdata$DEP_HOUR,
+                         data = flightdata,
+                         ntree = 250,       
+                         ntree = 500,       
+                         mtry = 2,          
+                         importance = TRUE)
+
+print(rf_model)
+```
+
+This is the plot of the different regions average DEP_DELAY. This will show patterns in the data for which regions have the worst delays. Arrival delays are less important because they can be a result of the departure delay. We can see in this graph which regions are most on time. This is important when consulting the infrastructure.
+
+```{r}
+ggplot(flightdata %>% 
+         group_by(region) %>% 
+         summarise(mean_delay = mean(DEP_DELAY, na.rm = TRUE)),
+       aes(x = region, y = mean_delay, color = region)) +
+  geom_point(size = 4) +
+  scale_color_viridis_d() +
+  labs(title = "Mean Departure Delay by Region",
+       y = "Mean Delay (minutes)", x = "Region")
+```
+
+To see that there is an actual statistical significance within the data we need to run a chi squared test. Based off the data we can see the results show that there is a difference and the region does make a difference.
+
+```{r}
+cont_table <- table(flightdata$isDelayed, flightdata$region)
+
+print(cont_table)
+
+addmargins(cont_table)
+
+ggplot(flightdata %>% group_by(region) %>% summarise(mean_delay = mean(ARR_DELAY + DEP_DELAY, na.rm = TRUE)),
+       aes(region, mean_delay, fill = region)) + geom_col() + scale_fill_viridis_d()
+chi_result <- chisq.test(cont_table)
+
+chi_result
+```
+
+# Logistic Regression and Next Month Delay Prediction [Jael]
