@@ -267,6 +267,14 @@ pr_obj$auc.integral
 plot(pr_obj, main = "Precision–Recall curve for flight delay model")
 ```
 
+The matrix confussion is plotted and the interpretation is as follow: 
+True negatives (TN): 25,492 flights that were on‑time and predicted on‑time.
+False positives (FP): 1,254 flights that were on‑time but predicted delayed.
+False negatives (FN): 10,843 flights that were delayed but predicted on‑time.
+True positives (TP): 1,755 flights that were delayed and predicted delayed.
+This shows the model misses many delays but rarely raises a false alarm.
+
+
 ```{r}
 library(caret)  
 
