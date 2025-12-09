@@ -1,8 +1,14 @@
 ---
 title: "Data Science Project 2 Airline Data"
-author: "Laura Escher"
+author: "Laura Escher, Jael Rojas, Adam Burke, Muhannad Alhamoudi"
 date: "2025-12-04"
-output: html_document
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -29,27 +35,23 @@ knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 options(scientific=T, digits = 3)
 ```
 
-Our research purpose is to determine which variables predict a late arrival for flights in the U.S. and
-the degree in which they influence a late arrival. To phrase it as a question, “What are the main
-determinants for a late arrival in the U.S.?” 
-
-# EDA For the Airline Dataset
+# Loading in the Dataset [Laura]
 
 ```{r}
 airdata <- read.csv("C:/Users/esche_zla0rp6/OneDrive - The George Washington University/Intro to Data Science/Data Science Project 2/sample airline data.csv")
-
+str(airdata)
 colSums(is.na(airdata))
 sum(is.na(airdata))
 ```
 
-We first opened up the file and examined the data using the str() function. We checked to see if there are any missing values in the data, which there are 2,425,691 across different columns and rows. There are 529,747 observations in this data set, and 27 variables. This data is flight specific during the month of January 2025. The variables are:
+We first opened up the file and examined the data using the str() function. We checked to see if there are any missing values in the data, which there are 2,425,691 across different columns and rows. There are 539,747 observations in this data set, and 47 variables. This data is flight specific during the month of January 2025. We will include 27 variables from the original data set in our analysis:
 
 Variable  |  Definition
 
-- YEAR | Year 2025
-- MONTH | Month (MM) January
-- DAY_OF_MONTH | Day of the month 1-31
-- DAY_OF_WEEK | Day of the week 1(Monday) -7(Sunday).
+- YEAR | Year
+- MONTH | Month (MM)
+- DAY_OF_MONTH | Day of the month
+- DAY_OF_WEEK | Day of the week
 - OP_UNIQUE_CARRIER | Unique Carrier Code. When the same code has been used by multiple carriers, a numeric suffix is used for earlier users, for example, PA, PA(1), PA(2). Use this field for analysis across a range of years.
 - ORIGIN | Origin airport
 - ORIGIN_CITY_NAME | Origin Airport, City Name
@@ -74,18 +76,15 @@ Variable  |  Definition
 - SECURITY_DELAY | Security Delay, in Minutes
 - LATE_AIRCRAFT_DELAY | Late Aircraft Delay, in Minutes
 
-YEAR, MONTH, DAY_OF_MONTH, DAY_OF_WEEK, OP_UNIQUE_CARRIER, airline, ORIGIN, ORIGIN_CITY_NAME, DEST, DEST_CITY_NAME, CRS_DEP_TIME, DEP_TIME, DEP_DELAY, DEP_DELAY_NEW, DEP_DEL15, DISTANCE, CRS_ARR_TIME, ARR_TIME, ARR_DELAY, ARR_DELAY_NEW, ARR_DEL15, AIR_TIME, DISTANCE, DISTANCE_GROUP, CARRIER_DELAY, WEATHER_DELAY, NAS_DELAY, SECURITY_DELAY, LATE_AIRCRAFT_DELAY, delay15
-
 # SMART Questions
 
 Our SMART Questions for this analysis are:
-- Which of the major airlines have the most reliable on-time performance for airports?
-- Is there a relationship between airport and delay frequency/type of delay?
-- Is there a relationship between airline brand and delay frequency/type of delay? <-- we are mostly working on this one right now.
+- Do certain regions have more delays?
+- Is there a relationship between airline brand and delay frequency/type of delay?
 
-# EDA
+# EDA [Laura]
 
-Before filtering the data, how many airlines are there in the dataset?
+Before filtering the data, how many airlines are there in the data set?
 ```{r}
 airlinecode <- c('DL', 'WN', 'B6', 'UA', 'AA', 'G4', 'F9', 'HA', 'AS', 'MQ', 'NK', 'PS', 'OO', 'YX', 'NA')
 
@@ -101,21 +100,19 @@ airdata1 <- airdata %>%
 # airdata %>%
 #   count(OP_UNIQUE_CARRIER)
 
-ggplot(data = airdata1, aes(x = reorder(airline, airline, FUN = length))) +
-  geom_bar(fill = "blue") +
-  labs(
-    title = "Number of Airlines",
-    x = "Airlines",
-    y = "Number of Flights by Airline"
-  ) +
+ggplot(data = airdata1, aes(x = airline)) +
+  geom_bar(fill = 'blue') +
+  labs(title = "Number of Airlines",
+       x = "Airlines",
+       y = "Number of Flights by Airline") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 0.5))
-
 ```
 
 There are 14 airlines total that flew in January 2025.
 
-Now, before analyzing the data further, we will match airline codes to airlines. Then, we will filter by the 9 major airlines in the U.S.: Delta, Southwest, JetBlue, United, American, Allegiant, Frontier, Hawaiian, and Alaska. We also make a new variable called "delay_minutes" to sum departure and arrival delays into one column for later analysis.
+Now, before analyzing the data further, we will match airline codes to airlines. Then, we will filter by the 9 major airlines in the U.S.: Delta, Southwest, JetBlue, United, American, Allegiant, Frontier, Hawaiian, and Alaska. We also make a new variable called "delay_minutes" to sum departure and arrival delays into one column for later analysis. With delay_minutes and airline added, there are now 29 variables.
+
 ```{r}
 major <- c('DL', 'WN', 'B6', 'UA', 'AA', 'G4', 'F9', 'HA', 'AS')
 
@@ -134,8 +131,9 @@ majorairline <- airdata %>%
 sum(is.na(majorairline))
 colSums(is.na(majorairline))
 ```
-Before moving forward, once again, the five types of delays all have the same number of NAs at 317,538 each. Are there any such cases where there are zeros across the five types? Maybe the Bureau of Transportation Statistics should have put zeros where they were needed.
-Justification: The number of rows (fivedelays_zero) will tell us how many flights were truly on time with no delay at all (neither 15 minutes as the convention).
+
+Before moving forward, once again, the five types of delays all have the same number of NAs at 317,538 each. Are there any such cases where there are zeros across the five types at the same time? Maybe the Bureau of Transportation Statistics should have put zeros where they were needed. If there are structural zeros in the data set, it means that the Bureau of Transportation Statistics left out zeros in a systemic way that affects the entire data set.
+
 ```{r}
 fivedelays_zero <- majorairline %>%
    filter(WEATHER_DELAY == 0,
@@ -146,9 +144,9 @@ fivedelays_zero <- majorairline %>%
           )
 nrow(fivedelays_zero)
 ```
-There are zero observations from the filtering the data set for cases where there are zeros across the five delay types.
+There are zero observations from the filtering the data set for cases where there are zeros across the five delay types. This confirms our suspicion of structural zeros in our data set and we can insert zeros where there should be if there were observations with zero delays.
 
-Now, let's clean out the rest of the 1,694,386 NAs from the analysis. We will do this by routing true zeros to the NAs in the five types of delays when delay_minutes equals zero across those columns. This leaves us with zero NAs in our data set with 277,538 observations total. Additionally, we created indicator variables for the types of delays. We are left with 35 variables.
+Now, let's clean out the rest of the 1,694,386 NAs from the analysis. We will do this by routing the structural zeros to the NAs in the five types of delays when delay_minutes equals zero across those columns. This leaves us with zero NAs in our data set with 277,538 observations total. Additionally, we created indicator variables for the types of delays. We are left with 35 variables.
 
 ```{r}
 majorairline <- majorairline %>%
@@ -173,7 +171,7 @@ majorairline <- majorairline %>%
 
 sum(is.na(majorairline))
 ```
-## Number of Flights Left Per Airline
+## Number of Flights Per Airline
 
 ```{r}
 flights_per_airline <- majorairline %>%
@@ -192,6 +190,8 @@ ggplot(data = majorairline, aes(x = airline)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 0.5))
 ```
 
+Southwest has the most amount of flights in the filtered data set, followed by Delta, American, and United.
+
 ## Delay rate by airline
 
 Perhaps some airlines are delayed more than others. We compare airlines and their probability of being delayed below.
@@ -209,15 +209,15 @@ ggplot(data = delay_summary, aes(x = airline, y = p_delay)) +
        y = "Proportion of Delays") +
   theme_minimal()
 ```
-JetBlue and Frontier have the highest delay rates at 32.4% and 32.5%.
+The highest delay rates are Frontier at 32.5% and JetBlue at 32.4%.
 
 The lowest delay rates are Southwest at 21.3% and Hawaiian at 20.3%.
 
-The sample sizes (n) are largest for American, Delta, Southwest, and United, so their statistics are likely more stable.
+As noted in the bar chart above, the sample sizes (n) are largest for American, Delta, Southwest, and United.
 
-All airlines in the sample have departure delay rates above ___, which is quite high compared to typical industry averages, where usually 15-30% of flights experience significant delays.
+All airlines in the sample have delay rates above 20% (irrespective of departure or arrival delay), which is comparable to typical industry averages, where usually 15-30% of flights experience significant delays.
 
-There are a significant number of outliers in the data set, so we can create a box plot to illustrate if there is a difference between the airlines and their delay minutes.
+There are a significant number of outliers in the data set, so we can create a box plot to illustrate if there is a difference between the airlines and their delay minutes. We also create a chart to show which airlines had the longest delays in January 2025.
 
 ```{r}
 ggplot(
@@ -231,7 +231,18 @@ ggplot(
     y = "Delay Minutes"
   ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+maxdelay <- majorairline %>%
+  group_by(airline) %>%
+  summarise(
+    max_delayminutes = max(delay_minutes)
+  )
+print(maxdelay)
+
 ```
+
+The box plot above shows that there are no statistically significant differences among the airlines in their total delay minutes, regardless of whether the delay was departure or arrival related. Additionally, American airlines had the longest maximum delay at 6580 minutes. The next longest delay was Allegiant at 2903 minutes in delays. The lowest delay in minutes for a single flight was from Southwest airlines at 1463 minutes.
 
 ## Delay Type Rates by Airline
 
@@ -264,7 +275,11 @@ ggplot(avg_delay_type, aes(x = airline, y = rate, fill = delay_type)) +
         legend.position = "top")
 ```
 
-Here are the weather delays by airline type:
+JetBlue has the highest NAS and Carrier delays. Frontier has the highest late aircraft delay. Security delays were very low percentages across all the airlines, but the highest security delay rate appears to be found with Alaska airlines. Lastly, weather delays were highest with Hawaiian airlines. Overall, we were surprised that there were not higher weather delays in the data set given that it was wintertime in the U.S. and it snows at many U.S. airports during the winter season.
+
+Let's look at the types of delays by airline and see if they differed across airlines. In general, we found that the airlines experienced delays less than 50 minutes in the following graphs.
+
+Here are the weather delays by airline. It appears that weather delays do not differ significantly from one airline to another.
 ```{r}
 weather_only <- majorairline %>% filter(WEATHER_DELAY > 0)
 
@@ -280,7 +295,7 @@ ggplot(weather_only, aes(x = airline, y = WEATHER_DELAY, fill = airline)) +
   theme(legend.position = "none")
 ```
 
-Here are NAS delays by airline.
+Here are NAS delays by airline. It appears that NAS delays do not differ significantly from one airline to another.
 ```{r}
 nas_only <- majorairline %>% filter(NAS_DELAY > 0)
 
@@ -296,7 +311,7 @@ ggplot(nas_only, aes(x = airline, y = NAS_DELAY, fill = airline)) +
   theme(legend.position = "none")
 ```
 
-Here are the security delays per airline.
+Here are the security delays per airline. It appears that security delays do differ significantly from one airline to another.
 ```{r}
 security_only <- majorairline %>% filter(SECURITY_DELAY > 0)
 
@@ -312,7 +327,7 @@ ggplot(security_only, aes(x = airline, y = SECURITY_DELAY, fill = airline)) +
   theme(legend.position = "none")
 ```
 
-Here are the carrier delays per airline.
+Here are the carrier delays per airline. It appears that carrier delays do not differ significantly from one airline to another.
 ```{r}
 carrier_only <- majorairline %>% filter(CARRIER_DELAY > 0)
 
@@ -328,7 +343,7 @@ ggplot(carrier_only, aes(x = airline, y = CARRIER_DELAY, fill = airline)) +
   theme(legend.position = "none")
 ```
 
-Here are the late aircraft delays per airline.
+Here are the late aircraft delays per airline. It appears that late aircraft delays do not differ significantly from one airline to another.
 ```{r}
 lateaircraft_only <- majorairline %>% filter(LATE_AIRCRAFT_DELAY > 0)
 
@@ -345,6 +360,8 @@ ggplot(lateaircraft_only, aes(x = airline, y = LATE_AIRCRAFT_DELAY, fill = airli
 ```
 
 ## EDA for Origin Airport and Destination Airport Delay Probabilities
+
+For the last portion of EDA, we thought it would be a good idea to showcase the delays by origin and destination airport.
 
 ```{r}
 originairport_summary <- majorairline %>%
@@ -372,6 +389,8 @@ ggplot(worst_25, aes(x = reorder(ORIGIN_CITY_NAME, delay_rate), y = delay_rate))
        y = "Proportion of Delayed Flights") +
   theme_minimal()
 ```
+
+
 
 ```{r}
 destairport_summary <- majorairline %>%
@@ -402,6 +421,8 @@ ggplot(destworst_25, aes(x = reorder(DEST_CITY_NAME, delay_rate), y = delay_rate
 
 ## Convert categorical variables to factors
 
+Before finishing up EDA, we decided to convert certain variables to factor variables.
+
 ```{r}
 majorairline$airline <- as.factor(majorairline$airline)
 majorairline$OP_UNIQUE_CARRIER <- as.factor(majorairline$OP_UNIQUE_CARRIER)
@@ -409,22 +430,35 @@ majorairline$OP_CARRIER <- as.factor(majorairline$OP_UNIQUE_CARRIER)
 majorairline$DEP_DEL15 <- as.factor(majorairline$DEP_DEL15)
 majorairline$MONTH <- as.factor(majorairline$MONTH)
 majorairline$DAY_OF_WEEK <- as.factor(majorairline$DAY_OF_WEEK)
+majorairline$DEST <- as.factor(majorairline$DEST)
+majorairline$ORIGIN <- as.factor(majorairline$ORIGIN)
 ```
 
-# Statistical Tests
+# Statistical Tests [Muhannad]
 
 ## Chi-square test: Airline vs Delay Type
 
 ```{r}
 tab <- table(majorairline$airline, majorairline$is_delayed)
 chisq.test(tab)
+```
 
+There is a significant relationship between airline and delay frequency.
+Some airlines have a much higher proportion of delayed flights than others.
+
+## Chi-square Tests: Airline vs Type of Delay
+```{r}
 chisq.test(majorairline$airline, majorairline$carrier_delay_ind)
 chisq.test(majorairline$airline, majorairline$weather_delay_ind)
 chisq.test(majorairline$airline, majorairline$nas_delay_ind)
 chisq.test(majorairline$airline, majorairline$security_delay_ind)
 chisq.test(majorairline$airline, majorairline$lateaircraft_delay_ind)
 ```
+
+There is a significant relationship between airline and each type of delay.
+Different airlines experience weather, carrier, NAS, security, and late-aircraft delays at different rates, meaning some airlines are more prone to certain delay types than others.
+
+Based on Chi-Square tests (p < 2e-16 for all comparisons), there is a strong and statistically significant relationship between airline brand and both delay frequency and delay type. This indicates that delays are not evenly distributed across airlines; instead, some airlines are more prone to specific kinds of delays than others.
 
 ## ANOVA tests delay in minutes (quantitative dependent) VS airline (factor variable)
 
@@ -434,83 +468,9 @@ summary(anova1)
 TukeyHSD(anova1)
 ```
 
+There are significant differences in the average delay minutes across airlines (p < 2e−16).
+Some airlines have much longer delays than others.
+
 # Statistical Modeling
 
 ## Logistic regression:
-
-```{r}
-logit_model <- glm(is_delayed ~ airline + DAY_OF_WEEK + CRS_DEP_TIME + C DISTANCE + CARRIER_DELAY + WEATHER_DELAY + NAS_DELAY + SECURITY_DELAY + LATE_AIRCRAFT_DELAY, data = majorairline, family = binomial)
-summary(logit_model)
-```
-
-# Correlation of numeric variables
-```{r}
-datasummary_correlation(majorairline %>% select_if(is.numeric))
-```
-
-```{r}
-correlation1 <- cor(majorairline$LATE_AIRCRAFT_DELAY, majorairline$delay_minutes,
-                   use = "complete.obs")
-correlation2 <- cor(majorairline$CARRIER_DELAY, majorairline$delay_minutes,
-                   use = "complete.obs")
-correlation3 <- cor(majorairline$WEATHER_DELAY, majorairline$delay_minutes,
-                   use = "complete.obs")
-correlation4 <- cor(majorairline$NAS_DELAY, majorairline$delay_minutes,
-                   use = "complete.obs"))
-correlation5 <- cor(majorairline$SECURITY_DELAY, majorairline$delay_minutes,
-                   use = "complete.obs"))
-
-ggplot(majorairline, aes(x = LATE_AIRCRAFT_DELAY, y = delay_minutes)) +
-  geom_point(color = "steelblue", size = 3, alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linewidth = 1) +
-  labs(title = "test",
-       x = "distance",
-       y = "delay minutes",
-       caption = paste("Correlation coefficient: r =", round(correlation, 3))) +
-  scale_x_continuous(labels = scales::comma) +
-  scale_y_continuous(labels = scales::comma) +
-  theme_classic() +
-  theme(
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 13),
-    axis.title = element_text(size = 12, face = "bold"),
-    axis.text = element_text(color = "black", size = 11),
-    plot.caption = element_text(hjust = 0, size = 11, face = "italic")
-  )
-
-
-```ggplot(majorairline, aes(x = CARRIER_DELAY, y = delay_minutes)) +
-  geom_point(color = "lightpink", size = 3, alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linewidth = 1) +
-  labs(title = "test",
-       x = "distance",
-       y = "delay minutes",
-       caption = paste("Correlation coefficient: r =", round(correlation, 3))) +
-  scale_x_continuous(labels = scales::comma) +
-  scale_y_continuous(labels = scales::comma) +
-  theme_classic() +
-  theme(
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 13),
-    axis.title = element_text(size = 12, face = "bold"),
-    axis.text = element_text(color = "black", size = 11),
-    plot.caption = element_text(hjust = 0, size = 11, face = "italic")
-  )
-
-ggplot(majorairline, aes(x = WEATHER_DELAY, y = delay_minutes)) +
-  geom_point(color = "lightpink", size = 3, alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linewidth = 1) +
-  labs(title = "test",
-       x = "distance",
-       y = "delay minutes",
-       caption = paste("Correlation coefficient: r =", round(correlation, 3))) +
-  scale_x_continuous(labels = scales::comma) +
-  scale_y_continuous(labels = scales::comma) +
-  theme_classic() +
-  theme(
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 13),
-    axis.title = element_text(size = 12, face = "bold"),
-    axis.text = element_text(color = "black", size = 11),
-    plot.caption = element_text(hjust = 0, size = 11, face = "italic")
-
-  )
-
-
