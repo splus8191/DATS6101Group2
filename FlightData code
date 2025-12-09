@@ -23,10 +23,6 @@ Additional Useful Variables
 DEP_TIME_BLK and ARR_TIME_BLK: Time windows for departure and arrival.​
 TAXI_OUT and TAXI_IN: Taxi times, which can be correlated with airport congestion.
 
-
-The code reads and merges CSV files for January to July, selects relevant columns, preprocesses data,
-and trains a logistic regression model to predict the probability of a delay (ARR_DEL15 = 1).
-
 ---
 title: "Data Science Project 2 Airline Data"
 author: "Jael Rojas"
@@ -82,9 +78,9 @@ flights_all <- flights_all %>%
   filter(ORIGIN %in% top_airports,
          DEST   %in% top_airports)
 ```
-Here, is removed the missing values in the variables that wuill be used as predictors in the model (ARR_DEL15, carrier, airports, day of week, schedule times, departure delay flag, distance, and month),
+Here, is removed the missing values in the variables that will be used as predictors in the model (ARR_DEL15, carrier, airports, day of week, schedule times, departure delay flag, distance, and month),
 then drop the columns that store delay minutes (containg NA mostly) by cancellation information, since they are not usefull for initial prediction.
-Is Assigned key categorical variables (carrier, origin, destination, departure time block, arrival time block) as factors so that the logistic regression treats them as categorical predictors
+Is assigned key categorical variables (carrier, origin, destination, departure time block, arrival time block) as factors so that the logistic regression treats them as categorical predictors
 rather than numeric values.
 
 
@@ -95,7 +91,7 @@ flights_all <- flights_all %>%
           DAY_OF_WEEK, CRS_DEP_TIME, CRS_ARR_TIME,
           DEP_DEL15, DISTANCE, MONTH)
 
-# Remove cause‑minute columns (used only for ex‑post analysis)
+# Remove cause‑minute columns (used only for post analysis)
 flights_all <- flights_all %>%
   select(-CANCELLATION_CODE, -CARRIER_DELAY, -WEATHER_DELAY, -NAS_DELAY,
          -SECURITY_DELAY, -LATE_AIRCRAFT_DELAY)
@@ -152,19 +148,21 @@ Airports:
 
 Several origin airports (CLT, LAS, LAX, MCO, ORD, PHX, SEA) have negative, highly significant coefficients, indicating lower delay odds than the reference origin, while DEN and DFW are roughly similar to the reference.
 
-On the destination side, DEN and DFW slightly increase delay odds, whereas many others (CLT, LAS, LAX, ORD, PHX, SEA) reduce them relative to the reference destination. This captures route- and airport-specific congestion patterns.
+On the destination side, DEN and DFW slightly increase delay odds, whereas many others (CLT, LAS, LAX, ORD, PHX, SEA) reduce them relative to the reference destination. This suggests route- and airport-specific congestion patterns.
 
-Calendar effects:
+Calendar:
 
 DAY_OF_WEEK has a small positive coefficient (≈ 0.031, highly significant), so flights later in the week have gradually higher odds of delay (about 3% increase in odds per day).
 
 MONTH has a stronger positive effect (≈ 0.153, highly significant), implying that each later month in the training period raises delay odds by about 17%, reflecting seasonal worsening into spring/summer.
 
+
 Time-of-day (departure and arrival blocks):
 
 Early-morning departures are the baseline; from mid-morning onward, departure coefficients grow steadily and become large and positive in the afternoon and evening This means flights leaving later in the day have much higher odds of being delayed, consistent with delay propagation.
 
-Arrival blocks show a similar pattern: late-afternoon and evening arrivals have markedly higher delay odds than early-morning arrivals.
+Arrival blocks show a similar pattern: late-afternoon and evening arrivals have higher delay odds than early-morning arrivals.
+
 
 Distance:
 
@@ -221,15 +219,16 @@ ggplot(dep_grid,
        title = "Effect of departure time on delay risk") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 ```
 
 
 Here is evaluated the logistic regression on July data by computing predicted probabilities, building a ROC curve, and calculating the area under the curve (AUC).
+First, it generates predicted probabilities of ARR_DEL15 = 1 for each flight in test_data;
+then ROC function compares these probabilities to the true labels to construct the ROC object, 
+and AUC function reports the model’s discrimination ability as a single number.
 
-First, it generates predicted probabilities of ARR_DEL15 = 1 for each flight in test_data; then roc() compares these probabilities to the true labels to construct the ROC object, and auc() reports the model’s discrimination ability as a single number.
-
-The plotted ROC curve (blue line) bows well above the diagonal reference line, indicating that the model distinguishes delayed from on‑time flights better than random; with an AUC around 0.7, it has moderate predictive power, for ranking flights by delay risk).
+The plotted ROC curve (blue line) bows well above the diagonal reference line, indicating that the model distinguishes delayed from on‑time flights 
+better than random; with an AUC around 0.7, it has moderate predictive power, for ranking flights by delay risk).
 
 ```{r}
 #install.packages("pROC")
@@ -245,12 +244,12 @@ auc(roc_obj)        # numeric AUC
 plot(roc_obj, col = "blue", main = "ROC curve - flight delay model")
 ```
 
+Is used the PRROC package to evaluate if the model identifies delayed flights when delays are relatively rare, by computing a precision–recall (PR) curve.
+It separates predicted probabilities into scores for delayed flights (fg, foreground) and on‑time flights (bg, background),
+then calls pr.curve() to estimate the PR curve and the area under it (auc.integral), and finally plots precision versus recall across all possible thresholds.
 
-Is used the PRROC package to evaluate how well the model identifies delayed flights when delays are relatively rare, by computing a precision–recall (PR) curve on the test set.
-
-It separates predicted probabilities into scores for delayed flights (fg, foreground) and on‑time flights (bg, background), then calls pr.curve() to estimate the PR curve and the area under it (auc.integral), and finally plots precision versus recall across all possible thresholds.
-
-The PR curve shows precision of 0.5–0.6 for moderate recall values, with an overall PR‑AUC of about 0.49, which is better than the baseline of the positive rate but still indicates that, when trying to capture many delayed flights, the model produces a fair number of false alarms; it is useful for ranking flights by risk but not highly precise at high recall.
+The PR curve shows precision of 0.5–0.6 for moderate recall values, with an overall PR‑AUC of about 0.49, which is better than the baseline of the positive rate but still indicates that, 
+when trying to capture many delayed flights, the model produces a fair number of false alarms; it is useful for ranking flights by risk but not highly precise at high recall.
 
 ```{r}
 #install.packages("PRROC") 
@@ -311,14 +310,10 @@ ggplot(cm_df, aes(x = Predicted, y = Actual, fill = Freq)) +
   theme_minimal()
 ```
 
-Here we built small “next‑month schedule” and uses your fitted logistic model to forecast delay probabilities, then visualizes those predictions by route and by day of week.
-
-Define 10 hypothetical August flights, covering several major carriers (AA, DL, UA, WN, AS, B6, F9, NK) and routes among the top airports, with specified day of week, distance, and departure/arrival time blocks.
-
+Here we built small “next‑month schedule” and uses the fitted logistic model to forecast delay probabilities, then visualizes those predictions by route and by day of week.
+Is defined 10 hypothetical August flights, covering several major carriers (AA, DL, UA, WN, AS, B6, F9, NK) and routes among the top airports, with specified day of week, distance, and departure/arrival time blocks.
 Plot a bar chart of predicted delay probability for each carrier–origin–destination combination, with bar color indicating whether the model classifies the flight as delayed (1) or on time (0) at the 0.5 threshold.
-
 Plot a scatter chart of predicted delay probability versus day of week, colored by carrier, to show the risks across the week and between airlines.
-
 
 ```{r}
 next_month_data <- data.frame(
