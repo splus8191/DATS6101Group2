@@ -2,8 +2,10 @@
 
 #  Author: Jael Rojas Miguel
 We will use machine learning to predict flight delays for the next month using data from the BTS TranStats from January to July 2025. 
+Smart question: Is the delay issues enough to predict for the next month?
 
-Most importatnt Variable used:
+
+Most important Variables used:
 
 ARR_DEL15: Binary flag indicating if the arrival was delayed by 15+ minutes (this is your target variable).​
 OP_UNIQUE_CARRIER: Airline code to identify the carrier.​
@@ -26,7 +28,7 @@ The code reads and merges CSV files for January to July, selects relevant column
 and trains a logistic regression model to predict the probability of a delay (ARR_DEL15 = 1).
 
 ---
-title: "Project Spotify analysis"
+title: "Data Science Project 2 Airline Data"
 author: "Jael Rojas"
 date: "`r Sys.Date()`"
 output:
