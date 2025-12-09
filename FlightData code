@@ -1,8 +1,6 @@
 #code
 
 #  Author: Jael Rojas Miguel
-Smart question: Is there a relationship between airport and delay frequency/type of delay?
-
 We will use machine learning to predict flight delays for the next month using data from the BTS TranStats from January to July 2025. 
 
 Most importatnt Variable used:
